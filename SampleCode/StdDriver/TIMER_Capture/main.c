@@ -88,6 +88,7 @@ void SYS_Init(void)
     CLK_SetHCLK(CLK_CLKSEL0_HCLK_S_HIRC, CLK_CLKDIV_HCLK(1));
 
     /* Enable XT1_OUT(PF.0) and XT1_IN(PF.1) */
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF0_Msk | SYS_GPF_MFP_PF1_Msk);
     SYS->GPF_MFP |= SYS_GPF_MFP_PF0_XT1_OUT | SYS_GPF_MFP_PF1_XT1_IN;
 
     /* Enable external 12 MHz XTAL */
@@ -115,11 +116,15 @@ void SYS_Init(void)
     /* Init I/O Multi-function                                                                                 */
     /*---------------------------------------------------------------------------------------------------------*/
     /* Set PB multi-function pins for UART0 RXD, TXD, TM0, TM1, TM2 and TM2_EXT */
-    SYS->GPB_MFP = SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD |
+    SYS->GPB_MFP &= ~(SYS_GPB_MFP_PB0_Msk | SYS_GPB_MFP_PB1_Msk |
+                   SYS_GPB_MFP_PB8_Msk | SYS_GPB_MFP_PB9_Msk | SYS_GPB_MFP_PB10_Msk |
+                   SYS_GPB_MFP_PB2_Msk);
+    SYS->GPB_MFP |= SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD |
                    SYS_GPB_MFP_PB8_TM0 | SYS_GPB_MFP_PB9_TM1 | SYS_GPB_MFP_PB10_TM2 |
                    SYS_GPB_MFP_PB2_TM2_EXT;
 
-    SYS->ALT_MFP  = SYS_ALT_MFP_PB2_TM2_EXT;
+    SYS->ALT_MFP &= ~(SYS_ALT_MFP_PB2_Msk);
+    SYS->ALT_MFP |= SYS_ALT_MFP_PB2_TM2_EXT;
 }
 
 void UART0_Init(void)

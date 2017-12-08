@@ -19,6 +19,7 @@ void SYS_Init(void)
 {
 
     /* Enable XT1_OUT (PF.0) and XT1_IN (PF.1) */
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF0_Msk | SYS_GPF_MFP_PF1_Msk);
     SYS->GPF_MFP |= SYS_GPF_MFP_PF0_XT1_OUT | SYS_GPF_MFP_PF1_XT1_IN;
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -64,18 +65,25 @@ void SYS_Init(void)
     /*---------------------------------------------------------------------------------------------------------*/
 
     /* Set GPB multi-function pins for UART0 RXD and TXD */
-    SYS->GPB_MFP = (SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD);
+    SYS->GPB_MFP &= ~(SYS_GPB_MFP_PB0_Msk | SYS_GPB_MFP_PB1_Msk);
+    SYS->GPB_MFP |= SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD;
 
     /* I/O Configure for NuEdu-NUC123 board */
     /* Set PF.2 and PF.3 to be I2C1SDA and I2C1SCL */
     /* Set I2S interface: I2SLRCLK (PC.0), I2SBCLK (PC.1), I2SDI (PC.2), I2SDO (PC.3) */
     /* Set PA.15 as I2SMCLK function pin */
-    SYS->GPA_MFP = SYS_GPA_MFP_PA15_I2S_MCLK;
-    SYS->GPC_MFP = SYS_GPC_MFP_PC0_I2S_LRCLK | SYS_GPC_MFP_PC1_I2S_BCLK | SYS_GPC_MFP_PC2_I2S_DI | SYS_GPC_MFP_PC3_I2S_DO;
+    SYS->GPA_MFP &= ~(SYS_GPA_MFP_PA15_Msk);
+    SYS->GPA_MFP |= SYS_GPA_MFP_PA15_I2S_MCLK;
+    SYS->GPC_MFP &= ~(SYS_GPC_MFP_PC0_Msk | SYS_GPC_MFP_PC1_Msk | SYS_GPC_MFP_PC2_Msk | SYS_GPC_MFP_PC3_Msk);
+    SYS->GPC_MFP |= SYS_GPC_MFP_PC0_I2S_LRCLK | SYS_GPC_MFP_PC1_I2S_BCLK | SYS_GPC_MFP_PC2_I2S_DI | SYS_GPC_MFP_PC3_I2S_DO;
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF2_Msk | SYS_GPF_MFP_PF3_Msk);
     SYS->GPF_MFP |= SYS_GPF_MFP_PF2_I2C0_SDA | SYS_GPF_MFP_PF3_I2C0_SCL;
-    SYS->ALT_MFP = SYS_ALT_MFP_PC0_I2S_LRCLK | SYS_ALT_MFP_PC1_I2S_BCLK | SYS_ALT_MFP_PC2_I2S_DI | SYS_ALT_MFP_PC3_I2S_DO |
+    SYS->ALT_MFP &= ~(SYS_ALT_MFP_PC0_Msk | SYS_ALT_MFP_PC1_Msk | SYS_ALT_MFP_PC2_Msk | SYS_ALT_MFP_PC3_Msk |
+                   SYS_ALT_MFP_PA10_Msk | SYS_ALT_MFP_PA11_Msk | SYS_ALT_MFP_PA15_Msk);
+    SYS->ALT_MFP |= SYS_ALT_MFP_PC0_I2S_LRCLK | SYS_ALT_MFP_PC1_I2S_BCLK | SYS_ALT_MFP_PC2_I2S_DI | SYS_ALT_MFP_PC3_I2S_DO |
                    SYS_ALT_MFP_PA10_I2C1_SDA | SYS_ALT_MFP_PA11_I2C1_SCL | SYS_ALT_MFP_PA15_I2S_MCLK;
-    SYS->ALT_MFP1 = SYS_ALT_MFP1_PF2_I2C0_SDA | SYS_ALT_MFP1_PF3_I2C0_SCL;
+    SYS->ALT_MFP1 &= ~(SYS_ALT_MFP1_PF2_Msk | SYS_ALT_MFP1_PF3_Msk);
+    SYS->ALT_MFP1 |= SYS_ALT_MFP1_PF2_I2C0_SDA | SYS_ALT_MFP1_PF3_I2C0_SCL;
 
 }
 

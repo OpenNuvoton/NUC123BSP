@@ -335,6 +335,7 @@ void SYS_Init(void)
     /*---------------------------------------------------------------------------------------------------------*/
 
     /* Enable XT1_OUT (PF0) and XT1_IN (PF1) */
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF0_Msk | SYS_GPF_MFP_PF1_Msk);
     SYS->GPF_MFP |= SYS_GPF_MFP_PF0_XT1_OUT | SYS_GPF_MFP_PF1_XT1_IN;
 
     /* Enable Internal RC 22.1184MHz clock */
@@ -382,10 +383,12 @@ void SYS_Init(void)
     /* Init I/O Multi-function                                                                                 */
     /*---------------------------------------------------------------------------------------------------------*/
     /* Set GPB multi-function pins for UART0 RXD and TXD */
-    SYS->GPB_MFP = SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD;
+    SYS->GPB_MFP &= ~(SYS_GPB_MFP_PB0_Msk | SYS_GPB_MFP_PB1_Msk);
+    SYS->GPB_MFP |= (SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD);
 
     /* Set PF multi-function pins for PS2 PS2_DAT and PS2_CLK */
-    SYS->GPF_MFP = SYS_GPF_MFP_PF2_PS2_DAT | SYS_GPF_MFP_PF3_PS2_CLK;
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF2_Msk | SYS_GPF_MFP_PF3_Msk);
+    SYS->GPF_MFP |= SYS_GPF_MFP_PF2_PS2_DAT | SYS_GPF_MFP_PF3_PS2_CLK;
 
 }
 

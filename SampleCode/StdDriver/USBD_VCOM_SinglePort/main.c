@@ -49,6 +49,7 @@ void SYS_Init(void)
 {
 
     /* Enable XT1_OUT (PF.0) and XT1_IN (PF.1) */
+    SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF0_Msk | SYS_GPF_MFP_PF1_Msk);
     SYS->GPF_MFP |= SYS_GPF_MFP_PF0_XT1_OUT | SYS_GPF_MFP_PF1_XT1_IN;
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -91,8 +92,10 @@ void SYS_Init(void)
     
     
     /* Set PC.13 as CLKO function pin */
-    SYS->GPC_MFP = SYS_GPC_MFP_PC13_CLKO;
-    SYS->ALT_MFP = SYS_ALT_MFP_PC13_CLKO;
+    SYS->GPC_MFP &= ~(SYS_GPC_MFP_PC13_CLKO);
+    SYS->GPC_MFP |= SYS_GPC_MFP_PC13_CLKO;
+    SYS->ALT_MFP &= ~(SYS_ALT_MFP_PC13_CLKO);
+    SYS->ALT_MFP |= SYS_ALT_MFP_PC13_CLKO;
 
     /* Enable CLKO (PC.13) for monitor HCLK. CLKO = HCLK/8 Hz*/
     CLK_EnableCKO(CLK_CLKSEL2_FRQDIV_S_HCLK, 2, NULL);
