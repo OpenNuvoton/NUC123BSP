@@ -46,7 +46,7 @@
 
 */
 
-#define USE_MY_HARDFAULT    1   /* Select to use default hard fault handler or not. 0: Default  1: User define */
+#define USE_MY_HARDFAULT    0   /* Select to use default hard fault handler or not. 0: Default  1: User define */
 
 
 #define HCLK_CLOCK  72000000
