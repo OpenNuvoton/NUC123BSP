@@ -1001,9 +1001,6 @@ void UAC_DeviceEnable(uint8_t u8Object)
 {
     if(u8Object == UAC_MICROPHONE)
     {
-        /* Enable record hardware */
-        g_u8RecEn = 1;
-
         if(g_u8RecEn == 0)
         {
             /* Reset record buffer */
@@ -1011,11 +1008,15 @@ void UAC_DeviceEnable(uint8_t u8Object)
             g_u32RecPos = 0;
         }
 
+        /* Enable record hardware */
+        g_u8RecEn = 1;
+
+        I2S_CLR_RX_FIFO(I2S);
+        I2S_EnableInt(I2S, I2S_IE_RXTHIE_Msk);
+        I2S_ENABLE_RX(I2S);
     }
     else
     {
-        /* Eanble play hardware */
-
         /* Reset Play buffer */
         if(g_u8PlayEn == 0)
         {
@@ -1023,9 +1024,14 @@ void UAC_DeviceEnable(uint8_t u8Object)
             memset(g_au32PcmPlayBuf, 0, sizeof(g_au32PcmPlayBuf));
             g_u32PlayPos_In = BUF_LEN / 2;
             g_u32PlayPos_Out = 0;
-            g_u8PlayEn = 1;
         }
 
+        /* Eanble play hardware */
+        g_u8PlayEn = 1;
+
+        I2S_CLR_TX_FIFO(I2S);
+        I2S_EnableInt(I2S, I2S_IE_TXTHIE_Msk);
+        I2S_ENABLE_TX(I2S);
     }
 }
 
@@ -1041,11 +1047,19 @@ void UAC_DeviceDisable(uint8_t u8Object)
     {
         /* Disable record hardware/stop record */
         g_u8RecEn = 0;
+
+        I2S_DisableInt(I2S, I2S_IE_RXTHIE_Msk);
+        I2S_DISABLE_RX(I2S);
+        I2S_CLR_RX_FIFO(I2S);
     }
     else
     {
         /* Disable play hardware/stop play */
         g_u8PlayEn = 0;
+
+        I2S_DisableInt(I2S, I2S_IE_TXTHIE_Msk);
+        I2S_DISABLE_TX(I2S);
+        I2S_CLR_TX_FIFO(I2S);
     }
 }
 
