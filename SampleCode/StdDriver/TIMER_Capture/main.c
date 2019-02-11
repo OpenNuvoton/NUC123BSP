@@ -200,7 +200,7 @@ int main(void)
 
     /* Check TM2_EXT interrupt counts */
     u32TimeoutCount = 0;
-    while(g_au32TMRINTCount[2] <= 10)
+    while(g_au32TMRINTCount[2] < 10)
     {
         if(g_au32TMRINTCount[2] != u32InitCount)
         {
