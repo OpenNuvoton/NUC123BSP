@@ -441,7 +441,9 @@ void CLK_DisableSysTick(void);
 
 /*@}*/ /* end of group Standard_Driver */
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__CLK_H__
 
