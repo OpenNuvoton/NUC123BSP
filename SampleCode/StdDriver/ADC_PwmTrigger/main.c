@@ -121,11 +121,11 @@ void ADC_PWMTrigTest_SingleOpMode()
 {
     printf("\n<<< PWM trigger test (Single mode) >>>\n");
 
-    /* Set the ADC operation mode as single, input mode as single-end and enable the analog input channel 2 */
-    ADC_Open(ADC, NULL, ADC_ADCR_ADMD_SINGLE, 0x1 << 2);
-
     /* Power on ADC module */
     ADC_POWER_ON(ADC);
+
+    /* Set the ADC operation mode as single, input mode as single-end and enable the analog input channel 2 */
+    ADC_Open(ADC, NULL, ADC_ADCR_ADMD_SINGLE, 0x1 << 2);
 
     /* Configure the hardware trigger condition and enable hardware trigger; PWM trigger delay: (4*10) system clock cycles*/
     ADC_EnableHWTrigger(ADC, ADC_ADCR_TRGS_PWM, 0);

@@ -130,12 +130,11 @@ void AdcSingleModeTest()
         u8Option = getchar();
         if(u8Option == '1')
         {
+            /* Power on ADC module */
+            ADC_POWER_ON(ADC);
 
             /* Set the ADC operation mode as single, input mode as single-end and enable the analog input channel 2 */
             ADC_Open(ADC, NULL, ADC_ADCR_ADMD_SINGLE, 0x1 << 2);
-
-            /* Power on ADC module */
-            ADC_POWER_ON(ADC);
 
             /* Clear the A/D interrupt flag for safe */
             ADC_CLR_INT_FLAG(ADC, ADC_ADF_INT);
