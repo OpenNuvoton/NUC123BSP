@@ -80,7 +80,7 @@ void SYS_Init(void)
                    SYS_ALT_MFP_PA10_I2C1_SDA | SYS_ALT_MFP_PA11_I2C1_SCL | SYS_ALT_MFP_PC12_I2S_MCLK | SYS_ALT_MFP_PC13_CLKO;
 
     /* Enable CLKO (PC.13) for monitor HCLK. CLKO = HCLK/8 Hz */
-    CLK_EnableCKO(CLK_CLKSEL2_FRQDIV_S_HCLK, 2, NULL);
+    CLK_EnableCKO(CLK_CLKSEL2_FRQDIV_S_HCLK, 2, (uint32_t)NULL);
 }
 
 void UART0_Init(void)

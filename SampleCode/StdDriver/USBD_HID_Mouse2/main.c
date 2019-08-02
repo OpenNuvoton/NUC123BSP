@@ -65,7 +65,7 @@ void SYS_Init(void)
     SYS->ALT_MFP |= SYS_ALT_MFP_PC13_CLKO;
 
     /* Enable CLKO (PC.13) for monitor HCLK. CLKO = HCLK/8 Hz*/
-    CLK_EnableCKO(CLK_CLKSEL2_FRQDIV_S_HCLK, 2, NULL);
+    CLK_EnableCKO(CLK_CLKSEL2_FRQDIV_S_HCLK, 2, (uint32_t)NULL);
 }
 
 
