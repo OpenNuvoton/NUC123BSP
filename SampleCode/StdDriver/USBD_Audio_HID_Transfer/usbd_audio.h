@@ -186,6 +186,7 @@
 
 #define PAGE_SIZE        256
 
+#pragma pack(1)
 typedef struct
 {
     uint8_t u8Cmd;
@@ -194,7 +195,7 @@ typedef struct
     uint32_t u32Arg2;
     uint32_t u32Signature;
     uint32_t u32Checksum;
-} __attribute__((packed)) CMD_T;
+} CMD_T;
 
 
 /*-------------------------------------------------------------*/
