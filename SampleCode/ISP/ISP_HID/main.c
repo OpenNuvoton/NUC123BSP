@@ -68,6 +68,9 @@ int32_t main(void)
     SYS_Init();
     CLK->AHBCLK |= CLK_AHBCLK_ISP_EN_Msk;
     FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
+
+    /* Get APROM size, data flash size and address */
+    g_apromSize = GetApromSize();
     GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
 
     while(DetectPin == 0)
