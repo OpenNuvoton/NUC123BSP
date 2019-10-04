@@ -15,8 +15,8 @@
 #include "targetdev.h"
 #include "i2c_transfer.h"
 
-#define PLLCON_SETTING          CLK_PLLCON_48MHz_HXT
-#define PLL_CLOCK               48000000
+#define PLLCON_SETTING  CLK_PLLCON_72MHz_HIRC
+#define PLL_CLOCK       71884880
 
 uint32_t u32Pclk0;
 uint32_t u32Pclk1;
