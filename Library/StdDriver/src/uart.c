@@ -6,6 +6,7 @@
  * @brief    NUC123 series UART driver source file
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 

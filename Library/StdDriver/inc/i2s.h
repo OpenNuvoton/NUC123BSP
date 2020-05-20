@@ -6,6 +6,7 @@
  * @brief    NUC123 series I2S driver header file
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #ifndef __I2S_H__

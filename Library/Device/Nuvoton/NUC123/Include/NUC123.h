@@ -6,6 +6,7 @@
  * @brief    NUC123 Series Peripheral Access Layer Header File
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2014~2016 Nuvoton Technology Corp. All rights reserved.
  *
  ******************************************************************************/
