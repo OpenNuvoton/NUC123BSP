@@ -58,14 +58,12 @@ static volatile uint8_t  g_usbd_CtrlInZeroFlag = 0;
  * @endcond
  */
 
+const S_USBD_INFO_T *g_usbd_sInfo;                  /*!< A pointer for USB information structure */
 
-const S_USBD_INFO_T *g_usbd_sInfo;                      /*!< A pointer for USB information structure */
-
-VENDOR_REQ g_usbd_pfnVendorRequest = NULL;              /*!< USB Vendor Request Functional Pointer */
-CLASS_REQ g_usbd_pfnClassRequest = NULL;                /*!< USB Class Request Functional Pointer */
-SET_INTERFACE_REQ g_usbd_pfnSetInterface = NULL;        /*!< USB Set Interface Functional Pointer */
-SET_CONFIG_CB g_usbd_pfnSetConfigCallback = NULL;       /*!< USB Set configuration callback function pointer */
-
+VENDOR_REQ g_usbd_pfnVendorRequest = NULL;          /*!< USB Vendor Request Functional Pointer */
+CLASS_REQ g_usbd_pfnClassRequest = NULL;            /*!< USB Class Request Functional Pointer */
+SET_INTERFACE_REQ g_usbd_pfnSetInterface = NULL;    /*!< USB Set Interface Functional Pointer */
+SET_CONFIG_CB g_usbd_pfnSetConfigCallback = NULL;   /*!< USB Set configuration callback function pointer */
 uint32_t g_u32EpStallLock                = 0;       /*!< Bit map flag to lock specified EP when SET_FEATURE */
 
 /**
@@ -144,9 +142,9 @@ void USBD_GetSetupPacket(uint8_t *buf)
 void USBD_ProcessSetupPacket(void)
 {
     g_usbd_CtrlOutToggle = 0;
-
     /* Get SETUP packet from USB buffer */
     USBD_MemCopy(g_usbd_SetupPacket, (uint8_t *)USBD_BUF_BASE, 8);
+
     /* Check the request type */
     switch(g_usbd_SetupPacket[0] & 0x60)
     {
@@ -259,7 +257,6 @@ void USBD_GetDescriptor(void)
                 }
             }
             USBD_PrepareCtrlIn((uint8_t *)g_usbd_sInfo->gu8HidReportDesc[g_usbd_SetupPacket[4]], u32Len);
-
             USBD_PrepareCtrlOut(0, 0);
             break;
         }
@@ -325,10 +322,11 @@ void USBD_StandardRequest(void)
                 // Return current configuration setting
                 /* Data stage */
                 M8(USBD_BUF_BASE + USBD_GET_EP_BUF_ADDR(EP0)) = g_usbd_UsbConfig;
+                USBD_SET_DATA1(EP1);
+                USBD_SET_PAYLOAD_LEN(EP1, 0);
                 USBD_SET_DATA1(EP0);
                 USBD_SET_PAYLOAD_LEN(EP0, 1);
                 /* Status stage */
-                USBD_SET_DATA1(EP1);
                 USBD_PrepareCtrlOut(0, 0);
                 DBG_PRINTF("Get configuration\n");
                 break;
@@ -336,6 +334,9 @@ void USBD_StandardRequest(void)
             case GET_DESCRIPTOR:
             {
                 USBD_GetDescriptor();
+                /* Status stage */
+                USBD_PrepareCtrlOut(0, 0);
+                DBG_PRINTF("Get descriptor\n");
                 break;
             }
             case GET_INTERFACE:
@@ -362,7 +363,6 @@ void USBD_StandardRequest(void)
                     if(g_usbd_sInfo->gu8ConfigDesc[7] & 0x20) u8Tmp |= (g_usbd_RemoteWakeupEn << 1); // Remote wake up
 
                     M8(USBD_BUF_BASE + USBD_GET_EP_BUF_ADDR(EP0)) = u8Tmp;
-
                 }
                 // Interface
                 else if(g_usbd_SetupPacket[0] == 0x81)
@@ -413,13 +413,12 @@ void USBD_StandardRequest(void)
                         {
                             USBD->EP[i].CFGP &= ~USBD_CFGP_SSTALL_Msk;
                             USBD->EP[i].CFG &= ~USBD_CFG_DSQ_SYNC_Msk;
-                            DBG_PRINTF("Clr stall ep%d %x\n",i, USBD->EP[i].CFGP);
+                            DBG_PRINTF("Clr stall ep%d %x\n", i, USBD->EP[i].CFGP);
                         }
                     }
                 }
                 else if(g_usbd_SetupPacket[2] == FEATURE_DEVICE_REMOTE_WAKEUP)
                     g_usbd_RemoteWakeupEn = 0;
-
                 /* Status stage */
                 USBD_SET_DATA1(EP0);
                 USBD_SET_PAYLOAD_LEN(EP0, 0);
@@ -455,14 +454,13 @@ void USBD_StandardRequest(void)
                 if(g_usbd_SetupPacket[2] == FEATURE_ENDPOINT_HALT)
                 {
                     USBD_SetStall(g_usbd_SetupPacket[4] & 0xF);
-                    DBG_PRINTF("Set feature. stall ep %d\n", g_usbd_SetupPacket[4] & 0xF);                    
+                    DBG_PRINTF("Set feature. stall ep %d\n", g_usbd_SetupPacket[4] & 0xF);
                 }
                 else if(g_usbd_SetupPacket[2] == FEATURE_DEVICE_REMOTE_WAKEUP)
                 {
                     g_usbd_RemoteWakeupEn = 1;
                     DBG_PRINTF("Set feature. enable remote wakeup\n");
                 }
-
                 /* Status stage */
                 USBD_SET_DATA1(EP0);
                 USBD_SET_PAYLOAD_LEN(EP0, 0);
@@ -555,7 +553,6 @@ void USBD_CtrlIn(void)
             USBD_SET_PAYLOAD_LEN(EP0, g_usbd_CtrlInSize);
             g_usbd_CtrlInPointer = 0;
             g_usbd_CtrlInSize = 0;
-            
         }
     }
     else // No more data for IN token
@@ -575,9 +572,7 @@ void USBD_CtrlIn(void)
             USBD_SET_PAYLOAD_LEN(EP0, 0);
             g_usbd_CtrlInZeroFlag = 0;
         }
-        
         DBG_PRINTF("Ctrl In done.\n");
-        
     }
 }
 
@@ -615,7 +610,6 @@ void USBD_CtrlOut(void)
     uint32_t u32Size;
 
     DBG_PRINTF("Ctrl Out Ack %d\n", g_usbd_CtrlOutSize);
-
     if(g_usbd_CtrlOutToggle != (USBD->EPSTS & USBD_EPSTS_EPSTS1_Msk))
     {
         g_usbd_CtrlOutToggle = USBD->EPSTS & USBD_EPSTS_EPSTS1_Msk;
@@ -649,7 +643,7 @@ void USBD_CtrlOut(void)
 void USBD_SwReset(void)
 {
     int i;
-    
+
     // Reset all variables for protocol
     g_usbd_CtrlInPointer = 0;
     g_usbd_CtrlInSize = 0;
@@ -714,15 +708,10 @@ void USBD_LockEpStall(uint32_t u32EpBitmap)
 
 /*@}*/ /* end of group USBD_Driver */
 
-/*@}*/ /* end of group Standard_Driver */
+/*@}*/ /* end of group Device_Driver */
 
 #ifdef __cplusplus
 }
 #endif
 
 /*** (C) COPYRIGHT 2014~2015 Nuvoton Technology Corp. ***/
-
-
-
-
-

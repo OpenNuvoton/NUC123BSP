@@ -16,9 +16,7 @@
 
 uint8_t volatile g_u8EP2Ready = 0;
 uint8_t volatile g_u8Suspend = 0;
-
-
-void PowerDown(void);
+uint8_t g_u8Idle = 0, g_u8Protocol = 0;
 
 void USBD_IRQHandler(void)
 {
@@ -209,21 +207,32 @@ void HID_ClassRequest(void)
         switch(buf[1])
         {
             case GET_REPORT:
-//             {
-//                 break;
-//             }
-            case GET_IDLE:
-//             {
-//                 break;
-//             }
-            case GET_PROTOCOL:
 //            {
 //                break;
 //            }
+            case GET_IDLE:
+            {
+                USBD_SET_PAYLOAD_LEN(EP1, buf[6]);
+                /* Data stage */
+                USBD_PrepareCtrlIn(&g_u8Idle, buf[6]);
+                /* Status stage */
+                USBD_PrepareCtrlOut(0, 0);
+                break;
+            }
+            case GET_PROTOCOL:
+            {
+                USBD_SET_PAYLOAD_LEN(EP1, buf[6]);
+                /* Data stage */
+                USBD_PrepareCtrlIn(&g_u8Protocol, buf[6]);
+                /* Status stage */
+                USBD_PrepareCtrlOut(0, 0);
+                break;
+            }
             default:
             {
                 /* Setup error, stall the device */
-                USBD_SetStall(0);
+                USBD_SetStall(EP0);
+                USBD_SetStall(EP1);
                 break;
             }
         }
@@ -245,62 +254,30 @@ void HID_ClassRequest(void)
             }
             case SET_IDLE:
             {
+                g_u8Idle = buf[3];
                 /* Status stage */
                 USBD_SET_DATA1(EP0);
                 USBD_SET_PAYLOAD_LEN(EP0, 0);
                 break;
             }
             case SET_PROTOCOL:
-//             {
-//                 break;
-//             }
+            {
+                g_u8Protocol = buf[2];
+                /* Status stage */
+                USBD_SET_DATA1(EP0);
+                USBD_SET_PAYLOAD_LEN(EP0, 0);
+                break;
+            }
             default:
             {
                 // Stall
                 /* Setup error, stall the device */
-                USBD_SetStall(0);
+                USBD_SetStall(EP0);
+                USBD_SetStall(EP1);
                 break;
             }
         }
     }
-}
-
-
-
-void PowerDown()
-{
-    printf("Enter power down ...\n");
-    while((UART0->FSR & UART_FSR_TE_FLAG_Msk) == 0);
-
-    /* Wakeup Enable */
-    USBD->INTEN |= USBD_INTEN_WAKEUP_IE_Msk;
-
-    /* Deep sleep */
-    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-    CLK->PWRCON |= CLK_PWRCON_PD_WAIT_CPU_Msk | CLK_PWRCON_PWR_DOWN_EN_Msk;
-
-    PB4 = 1; // LED off to show we are in suspend.
-    __WFI();
-    PB4 = 0; // LED on to show we are working.
-
-    /* Clear PWR_DOWN_EN if it is not clear by itself */
-    if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
-        CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
-
-    /* Note HOST to resume USB tree if it is suspended and remote wakeup enabled */
-    if(g_usbd_RemoteWakeupEn)
-    {
-        /* Enable PHY before sending Resume('K') state */
-        USBD->ATTR |= USBD_ATTR_PHY_EN_Msk;
-
-        /* Keep remote wakeup for 1 ms */
-        USBD->ATTR |= USBD_ATTR_RWAKEUP_Msk;
-        CLK_SysTickDelay(1000); /* Delay 1ms */
-        USBD->ATTR ^= USBD_ATTR_RWAKEUP_Msk;
-    }
-
-    printf("device wakeup!\n");
-
 }
 
 void HID_UpdateMouseData(void)
@@ -320,20 +297,11 @@ void HID_UpdateMouseData(void)
            PC5 left key
     */
 
-    u32Reg = PC->PIN & 0x3F;
-
-    /* Enter power down when USB suspend */
-    if(g_u8Suspend)
-    {
-        PowerDown();
-
-        /* Waiting for key release */
-        while((PC->PIN & 0x3F) != 0x3F);
-    }
-
     if(g_u8EP2Ready)
     {
         buf = (uint8_t *)(USBD_BUF_BASE + USBD_GET_EP_BUF_ADDR(EP2));
+
+        u32Reg = PC->PIN & 0x3f;
 
         /* To control Y axis */
         if((u32Reg & 1) == 0)

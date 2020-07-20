@@ -11,6 +11,7 @@
 #include "NUC123.h"
 #include "hid_mouse.h"
 
+int IsDebugFifoEmpty(void);
 
 /*--------------------------------------------------------------------------*/
 void SYS_Init(void)
@@ -75,6 +76,29 @@ void UART0_Init(void)
     UART0->LCR = UART_WORD_LEN_8 | UART_PARITY_NONE | UART_STOP_BIT_1;
 }
 
+void PowerDown()
+{
+    /* Unlock protected registers */
+    SYS_UnlockReg();
+
+    printf("Enter power down ...\n");
+    while(!IsDebugFifoEmpty());
+
+    /* Wakeup Enable */
+    USBD_ENABLE_INT(USBD_INTEN_WAKEUP_EN_Msk);
+
+    CLK_PowerDown();
+
+    /* Clear PWR_DOWN_EN if it is not clear by itself */
+    if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
+        CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
+
+    printf("device wakeup!\n");
+
+    /* Lock protected registers */
+    SYS_LockReg();
+}
+
 /*---------------------------------------------------------------------------------------------------------*/
 /*  Main Function                                                                                          */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -102,6 +126,10 @@ int32_t main(void)
 
     while(1)
     {
+        /* Enter power down when USB suspend */
+        if(g_u8Suspend)
+            PowerDown();
+
         HID_UpdateMouseData();
     }
 }

@@ -11,6 +11,8 @@
 #include "NUC123.h"
 #include "hid_mouse.h"
 
+uint8_t volatile g_u8RemouteWakeup = 0;
+int IsDebugFifoEmpty(void);
 
 /*--------------------------------------------------------------------------*/
 void SYS_Init(void)
@@ -98,8 +100,46 @@ void GPIO_Init(void)
 void GPCDF_IRQHandler(void)
 {
     PC->ISRC = 0x3f;
+    g_u8RemouteWakeup = 1;
     //PB4 ^= 1;
 
+}
+
+void PowerDown()
+{
+    /* Unlock protected registers */
+    SYS_UnlockReg();
+
+    printf("Enter power down ...\n");
+    while(!IsDebugFifoEmpty());
+
+    /* Wakeup Enable */
+    USBD_ENABLE_INT(USBD_INTEN_WAKEUP_IE_Msk);
+
+    CLK_PowerDown();
+
+    /* Clear PWR_DOWN_EN if it is not clear by itself */
+    if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
+        CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
+
+    /* Note HOST to resume USB tree if it is suspended and remote wakeup enabled */
+    if(g_usbd_RemoteWakeupEn && g_u8RemouteWakeup)
+    {
+        /* Enable PHY before sending Resume('K') state */
+        USBD->ATTR |= USBD_ATTR_PHY_EN_Msk;
+
+        /* Keep remote wakeup for 1 ms */
+        USBD->ATTR |= USBD_ATTR_RWAKEUP_Msk;
+        CLK_SysTickDelay(1000); /* Delay 1ms */
+        USBD->ATTR ^= USBD_ATTR_RWAKEUP_Msk;
+        g_u8RemouteWakeup = 0;
+        printf("Remote Wakeup!!\n");
+    }
+
+    printf("device wakeup!\n");
+
+    /* Lock protected registers */
+    SYS_LockReg();
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -138,6 +178,15 @@ int32_t main(void)
     PB4 = 0; // LED to show system is on line
     while(1)
     {
+        /* Enter power down when USB suspend */
+        if(g_u8Suspend)
+        {
+            PowerDown();
+
+            /* Waiting for key release */
+            while((GPIO_GET_IN_DATA(PC) & 0x3f) != 0x3f);
+        }
+
         HID_UpdateMouseData();
     }
 }

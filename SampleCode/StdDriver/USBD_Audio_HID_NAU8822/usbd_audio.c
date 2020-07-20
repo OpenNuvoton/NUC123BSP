@@ -14,6 +14,7 @@
 #include "NUC123.h"
 #include "usbd_audio.h"
 
+uint8_t g_u8Idle = 0, g_u8Protocol = 0;
 
 /*--------------------------------------------------------------------------*/
 /* Global variables for Audio class */
@@ -472,7 +473,6 @@ void UAC_ClassRequest(void)
                 USBD_PrepareCtrlOut(0, 0);
                 break;
             }
-
             case UAC_GET_MIN:
             {
                 switch(buf[3])
@@ -503,7 +503,6 @@ void UAC_ClassRequest(void)
                 USBD_PrepareCtrlOut(0, 0);
                 break;
             }
-
             case UAC_GET_MAX:
             {
                 switch(buf[3])
@@ -534,7 +533,6 @@ void UAC_ClassRequest(void)
                 USBD_PrepareCtrlOut(0, 0);
                 break;
             }
-
             case UAC_GET_RES:
             {
                 switch(buf[3])
@@ -565,11 +563,33 @@ void UAC_ClassRequest(void)
                 USBD_PrepareCtrlOut(0, 0);
                 break;
             }
-
+            case HID_GET_REPORT:
+//            {
+//                break;
+//            }
+            case HID_GET_IDLE:
+            {
+                USBD_SET_PAYLOAD_LEN(EP1, buf[6]);
+                /* Data stage */
+                USBD_PrepareCtrlIn(&g_u8Idle, buf[6]);
+                /* Status stage */
+                USBD_PrepareCtrlOut(0, 0);
+                break;
+            }
+            case HID_GET_PROTOCOL:
+            {
+                USBD_SET_PAYLOAD_LEN(EP1, buf[6]);
+                /* Data stage */
+                USBD_PrepareCtrlIn(&g_u8Protocol, buf[6]);
+                /* Status stage */
+                USBD_PrepareCtrlOut(0, 0);
+                break;
+            }
             default:
             {
                 /* Setup error, stall the device */
-                USBD_SetStall(0);
+                USBD_SetStall(EP0);
+                USBD_SetStall(EP1);
             }
         }
     }
@@ -648,17 +668,25 @@ void UAC_ClassRequest(void)
             }
             case HID_SET_IDLE:
             {
+                g_u8Idle = buf[3];
                 /* Status stage */
                 USBD_SET_DATA1(EP0);
                 USBD_SET_PAYLOAD_LEN(EP0, 0);
                 break;
             }
             case HID_SET_PROTOCOL:
-
+            {
+                g_u8Protocol = buf[2];
+                /* Status stage */
+                USBD_SET_DATA1(EP0);
+                USBD_SET_PAYLOAD_LEN(EP0, 0);
+                break;
+            }
             default:
             {
                 /* Setup error, stall the device */
-                USBD_SetStall(0);
+                USBD_SetStall(EP0);
+                USBD_SetStall(EP1);
                 break;
             }
         }

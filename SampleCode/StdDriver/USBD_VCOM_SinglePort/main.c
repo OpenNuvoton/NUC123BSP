@@ -44,6 +44,7 @@ volatile uint32_t gu32TxSize = 0;
 
 volatile int8_t gi8BulkOutReady = 0;
 
+int IsDebugFifoEmpty(void);
 
 void SYS_Init(void)
 {
@@ -138,7 +139,7 @@ void UART_IRQHandler(void)
 
     if((u32IntStatus & 0x1 /* RDAIF */) || (u32IntStatus & 0x10 /* TOUT_IF */))
     {
-        /* Receiver FIFO threashold level is reached or RX time out */
+        /* Receiver FIFO threshold level is reached or RX time out */
 
         /* Get all the input characters */
         while((UART->FSR & UART_FSR_RX_EMPTY_Msk) == 0)
@@ -197,10 +198,10 @@ void VCOM_TransferData(void)
 {
     int32_t i, i32Len;
 
-    /* Check wether USB is ready for next packet or not*/
+    /* Check whether USB is ready for next packet or not */
     if(gu32TxSize == 0)
     {
-        /* Check wether we have new COM Rx data to send to USB or not */
+        /* Check whether we have new COM Rx data to send to USB or not */
         if(comRbytes)
         {
             i32Len = comRbytes;
@@ -274,6 +275,28 @@ void VCOM_TransferData(void)
     }
 }
 
+void PowerDown()
+{
+    /* Unlock protected registers */
+    SYS_UnlockReg();
+
+    printf("Enter power down ...\n");
+    while(!IsDebugFifoEmpty());
+
+    /* Wakeup Enable */
+    USBD_ENABLE_INT(USBD_INTEN_WAKEUP_EN_Msk);
+
+    CLK_PowerDown();
+
+    /* Clear PWR_DOWN_EN if it is not clear by itself */
+    if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
+        CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
+
+    printf("device wakeup!\n");
+
+    /* Lock protected registers */
+    SYS_LockReg();
+}
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*  Main Function                                                                                          */
@@ -306,6 +329,10 @@ int32_t main(void)
 
     while(1)
     {
+        /* Enter power down when USB suspend */
+        if(g_u8Suspend)
+            PowerDown();
+
         VCOM_TransferData();
     }
 }

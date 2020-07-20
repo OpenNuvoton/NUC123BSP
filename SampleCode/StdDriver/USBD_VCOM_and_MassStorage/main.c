@@ -4,7 +4,6 @@
  *           Implement a USB composite device.
  *           It supports one virtual COM port and one USB Mass-Storage device.
  * @note
- *
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>

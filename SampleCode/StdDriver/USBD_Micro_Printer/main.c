@@ -2,7 +2,7 @@
  * @file     main.c
  * @brief
  *           Show how to implement a USB micro printer device.
- *           
+ *
  * @note
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
@@ -10,6 +10,7 @@
 #include "NUC123.h"
 #include "micro_printer.h"
 
+int IsDebugFifoEmpty(void);
 
 /*--------------------------------------------------------------------------*/
 void SYS_Init(void)
@@ -74,13 +75,36 @@ void UART0_Init(void)
     UART0->LCR = UART_WORD_LEN_8 | UART_PARITY_NONE | UART_STOP_BIT_1;
 }
 
+void PowerDown()
+{
+    /* Unlock protected registers */
+    SYS_UnlockReg();
+
+    printf("Enter power down ...\n");
+    while(!IsDebugFifoEmpty());
+
+    /* Wakeup Enable */
+    USBD_ENABLE_INT(USBD_INTEN_WAKEUP_EN_Msk);
+
+    CLK_PowerDown();
+
+    /* Clear PWR_DOWN_EN if it is not clear by itself */
+    if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
+        CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
+
+    printf("device wakeup!\n");
+
+    /* Lock protected registers */
+    SYS_LockReg();
+}
+
 /*---------------------------------------------------------------------------------------------------------*/
 /*  Main Function                                                                                          */
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void)
 {
     uint8_t Str[9];
-    
+
     /* Unlock protected registers */
     SYS_UnlockReg();
 
@@ -103,8 +127,13 @@ int32_t main(void)
     NVIC_EnableIRQ(USBD_IRQn);
 
     PB->PMD = 0x5000;   // PB.6, PB.7 output mode
-  
-    while(1) {
+
+    while(1)
+    {
+        /* Enter power down when USB suspend */
+        if(g_u8Suspend)
+            PowerDown();
+
         CLK_SysTickDelay(2000);   // delay
         if(++Str[1] > 0x39)
             Str[1] = 0x30;      // increase 1 to 10 than reset to 0
