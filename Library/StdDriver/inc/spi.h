@@ -162,6 +162,14 @@ extern "C"
 #define SPI_TRIGGER_TX_PDMA(spi)   ((spi)->DMA |= SPI_DMA_TX_DMA_GO_Msk)
 
 /**
+  * @brief      Trigger TX and RX PDMA function.
+  * @param[in]  spi The pointer of the specified SPI module.
+  * @return     None.
+  * @details    Set TX_DMA_GO bit and RX_DMA_GO bit of SPI_DMA register to enable TX and RX PDMA transfer function.
+  */
+#define SPI_TRIGGER_TX_RX_PDMA(spi)   ((spi)->DMA |= (SPI_DMA_TX_DMA_GO_Msk | SPI_DMA_RX_DMA_GO_Msk))
+
+/**
   * @brief      Get the count of available data in RX FIFO.
   * @param[in]  spi The pointer of the specified SPI module.
   * @return     The count of available data in RX FIFO.

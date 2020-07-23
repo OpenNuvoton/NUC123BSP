@@ -176,7 +176,7 @@ void SPI_Init(void)
     /*---------------------------------------------------------------------------------------------------------*/
     /* Configure SPI0 as a slave, clock idle low, 32-bit transaction, drive output on falling clock edge and latch input on rising edge. */
     /* Configure SPI0 as a low level active device. SPI peripheral clock rate is equal to system clock rate. */
-    SPI_Open(SPI0, SPI_SLAVE, SPI_MODE_0, 32, NULL);
+    SPI_Open(SPI0, SPI_SLAVE, SPI_MODE_0, 32, (uint32_t)NULL);
 }
 
 /*** (C) COPYRIGHT 2014~2015 Nuvoton Technology Corp. ***/
