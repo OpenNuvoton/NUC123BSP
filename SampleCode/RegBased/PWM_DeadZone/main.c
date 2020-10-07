@@ -95,13 +95,13 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~(CLK_CLKSEL1_PWM01_S_Msk | CLK_CLKSEL1_PWM23_S_Msk)) | \
                    (CLK_CLKSEL1_PWM01_S_HXT | CLK_CLKSEL1_PWM23_S_HXT);
     CLK->CLKSEL2 = (CLK->CLKSEL2 & ~(CLK_CLKSEL2_PWM01_S_E_Msk | CLK_CLKSEL2_PWM23_S_E_Msk)) | \
-                   (CLK->CLKSEL2 |= CLK_CLKSEL2_PWM01_EXT_HXT | CLK_CLKSEL2_PWM23_EXT_HXT);
+                   (CLK_CLKSEL2_PWM01_EXT_HXT | CLK_CLKSEL2_PWM23_EXT_HXT);
     
     /* User can select PWM module clock source from LIRC as below */
     //CLK->CLKSEL1 = (CLK->CLKSEL1 & ~(CLK_CLKSEL1_PWM01_S_Msk | CLK_CLKSEL1_PWM23_S_Msk)) | \
     //               (CLK_CLKSEL1_PWM01_S_LIRC | CLK_CLKSEL1_PWM23_S_LIRC);
     //CLK->CLKSEL2 = (CLK->CLKSEL2 & ~(CLK_CLKSEL2_PWM01_S_E_Msk | CLK_CLKSEL2_PWM23_S_E_Msk)) | \
-    //               (CLK->CLKSEL2 |= CLK_CLKSEL2_PWM01_EXT_LIRC | CLK_CLKSEL2_PWM23_EXT_LIRC);
+    //               (CLK_CLKSEL2_PWM01_EXT_LIRC | CLK_CLKSEL2_PWM23_EXT_LIRC);
 
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init I/O Multi-function                                                                                 */
