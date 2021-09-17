@@ -17,9 +17,11 @@
 #define PLLCON_SETTING  CLK_PLLCON_72MHz_HXT
 #define PLL_CLOCK       72000000
 
-uint32_t slave_buff_addr;
-uint8_t g_au8SlvData[256];
-uint8_t g_au8SlvRxData[3];
+static uint32_t slave_buff_addr;
+static uint8_t g_au8SlvData[256];
+static uint8_t g_au8SlvRxData[3];
+static volatile uint8_t g_u8SlvTRxAbortFlag = 0;
+static volatile uint8_t g_u8TimeoutFlag = 0;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -43,6 +45,7 @@ void I2C0_IRQHandler(void)
     {
         /* Clear I2C0 Timeout Flag */
         I2C0->I2CTOC |= I2C_I2CTOC_TIF_Msk;
+        g_u8TimeoutFlag = 1;
     }
     else
     {
@@ -57,7 +60,7 @@ void I2C0_IRQHandler(void)
 void I2C_SlaveTRx(uint32_t u32Status)
 {
     uint8_t u8data;
-    
+
     if(u32Status == 0x60)                       /* Own SLA+W has been receive; ACK has been return */
     {
         g_u8SlvDataLen = 0;
@@ -66,20 +69,20 @@ void I2C_SlaveTRx(uint32_t u32Status)
     else if(u32Status == 0x80)                 /* Previously address with own SLA address
                                                    Data has been received; ACK has been returned*/
     {
-        u8data = (unsigned char) I2C_GET_DATA(I2C0);   
-        if(g_u8SlvDataLen < 2)        
+        u8data = (unsigned char) I2C_GET_DATA(I2C0);
+        if(g_u8SlvDataLen < 2)
         {
-            g_au8SlvRxData[g_u8SlvDataLen++] = u8data;        
-            slave_buff_addr = (g_au8SlvRxData[0] << 8) + g_au8SlvRxData[1];            
+            g_au8SlvRxData[g_u8SlvDataLen++] = u8data;
+            slave_buff_addr = (g_au8SlvRxData[0] << 8) + g_au8SlvRxData[1];
         }
-        else 
+        else
         {
             g_au8SlvData[slave_buff_addr++] = u8data;
             if(slave_buff_addr==256)
             {
                 slave_buff_addr = 0;
-            }            
-        }            
+            }
+        }
 
         I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
     }
@@ -94,7 +97,7 @@ void I2C_SlaveTRx(uint32_t u32Status)
     {
         I2C_SET_DATA(I2C0, g_au8SlvData[slave_buff_addr++]);
         I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
-    }     
+    }
     else if(u32Status == 0xC0)                 /* Data byte or last data in I2CDAT has been transmitted
                                                    Not ACK has been received */
     {
@@ -114,8 +117,21 @@ void I2C_SlaveTRx(uint32_t u32Status)
     }
     else
     {
-        /* TO DO */
-        printf("Status 0x%x is NOT processed\n", u32Status);
+        printf("[SlaveTRx] Status [0x%x] Unexpected abort!!\n", u32Status);
+        if(u32Status == 0x68)               /* Slave receive arbitration lost, clear SI */
+        {
+            I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
+        }
+        else if(u32Status == 0xB0)          /* Address transmit arbitration lost, clear SI  */
+        {
+            I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
+        }
+        else                                /* Slave bus error, stop I2C and clear SI */
+        {
+            I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_STO_SI);
+            I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI);
+        }
+        g_u8SlvTRxAbortFlag = 1;
     }
 }
 
@@ -303,7 +319,31 @@ int32_t main(void)
     printf("\n");
     printf("I2C Slave Mode is Running.\n");
 
-    while(1);
+    g_u8TimeoutFlag = 0;
+
+    while(1)
+    {
+        /* Handle Slave timeout condition */
+        if(g_u8TimeoutFlag)
+        {
+            printf(" SlaveTRx time out, any to reset IP\n");
+            getchar();
+            SYS->IPRSTC2 |= SYS_IPRSTC2_I2C0_RST_Msk;
+            SYS->IPRSTC2 = 0;
+            I2C0_Init();
+            g_u8TimeoutFlag = 0;
+            g_u8SlvTRxAbortFlag = 1;
+        }
+        /* When I2C abort, clear SI to enter non-addressed SLV mode*/
+        if(g_u8SlvTRxAbortFlag)
+        {
+            g_u8SlvTRxAbortFlag = 0;
+
+            while(I2C0->I2CON & I2C_I2CON_SI_Msk);
+            printf("I2C Slave re-start. status[0x%x]\n", I2C0->I2CSTATUS);
+            I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
+        }
+    }
 }
 
 
