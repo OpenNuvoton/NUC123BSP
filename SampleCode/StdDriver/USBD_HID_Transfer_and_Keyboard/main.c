@@ -12,8 +12,6 @@
 #include "NUC123.h"
 #include "HID_Transfer_and_Keyboard.h"
 
-int IsDebugFifoEmpty(void);
-
 /*--------------------------------------------------------------------------*/
 void SYS_Init(void)
 {
@@ -90,9 +88,6 @@ void PowerDown()
     /* Unlock protected registers */
     SYS_UnlockReg();
 
-    printf("Enter power down ...\n");
-    while(!IsDebugFifoEmpty());
-
     /* Wakeup Enable */
     USBD_ENABLE_INT(USBD_INTEN_WAKEUP_EN_Msk);
 
@@ -101,8 +96,6 @@ void PowerDown()
     /* Clear PWR_DOWN_EN if it is not clear by itself */
     if(CLK->PWRCON & CLK_PWRCON_PWR_DOWN_EN_Msk)
         CLK->PWRCON ^= CLK_PWRCON_PWR_DOWN_EN_Msk;
-
-    printf("device wakeup!\n");
 
     /* Lock protected registers */
     SYS_LockReg();

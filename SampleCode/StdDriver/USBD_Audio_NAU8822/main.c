@@ -110,7 +110,7 @@ int32_t main(void)
     int32_t i;
 
     /*
-        This sample code is used to demo USB Audio Class + NAU8822 (WAU8822).
+        This sample code is used to demo USB Audio Class + NAU8822 (NAU8822).
         User can define PLAY_RATE in usbd_audio.h to support 48000Hz, 32000Hz, 16000Hz and 8000Hz.
 
         The audio is input from NAU8822 AUXIN.
@@ -137,11 +137,11 @@ int32_t main(void)
     printf("|          NuMicro USB Audio CODEC Sample Code          |\n");
     printf("+-------------------------------------------------------+\n");
 
-    /* Init I2C1 to access WAU8822 */
+    /* Init I2C1 to access NAU8822 */
     I2C1_Init();
 
-    /* Initialize WAU8822 codec */
-    WAU8822_Setup();
+    /* Initialize NAU8822 codec */
+    NAU8822_Setup();
 
     I2S_Open(I2S, I2S_MODE_SLAVE, PLAY_RATE, I2S_DATABIT_16, I2S_STEREO, I2S_FORMAT_I2S);
 
@@ -200,7 +200,7 @@ int32_t main(void)
             ch = getchar();
             u32Data = u32Data * 16 + ((ch >= '0' && ch <= '9') ? ch - '0' : ch - 'a' + 10);
             printf("%03x\n", u32Data);
-            I2C_WriteWAU8822(u32Reg,  u32Data);
+            I2C_WriteNAU8822(u32Reg,  u32Data);
         }
 
     }

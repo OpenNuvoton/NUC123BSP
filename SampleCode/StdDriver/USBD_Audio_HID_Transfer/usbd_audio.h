@@ -222,11 +222,11 @@ void EP5_Handler(void);
 void EP6_Handler(void);
 void EP7_Handler(void);
 
-void WAU8822_Setup(void);
+void NAU8822_Setup(void);
 void timer_init(void);
 void AdjFreq(void);
 void VolumnControl(void);
-void I2C_WriteWAU8822(uint8_t u8addr, uint16_t u16data);
+void I2C_WriteNAU8822(uint8_t u8addr, uint16_t u16data);
 
 #endif  /* __USBD_UAC_H_ */
 
