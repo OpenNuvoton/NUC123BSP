@@ -124,7 +124,7 @@ void UART_DisableInt(UART_T*  uart, uint32_t u32InterruptFlag)
  *
  *    @return       None
  *
- *    @details      The function is used to Enable UART auto flow control.
+ *    @details      The function is used to enable UART auto flow control.
  */
 void UART_EnableFlowCtrl(UART_T* uart)
 {
@@ -222,7 +222,7 @@ void UART_Open(UART_T* uart, uint32_t u32baudrate)
  *
  *    @param[in]    uart            The pointer of the specified UART module.
  *    @param[in]    pu8RxBuf        The buffer to receive the data of receive FIFO.
- *    @param[in]    u32ReadBytes    The the read bytes number of data.
+ *    @param[in]    u32ReadBytes    The read bytes number of data.
  *
  *    @return       u32Count Receive byte count
  *
@@ -240,7 +240,7 @@ uint32_t UART_Read(UART_T* uart, uint8_t *pu8RxBuf, uint32_t u32ReadBytes)
         {
             u32delayno++;
             if(u32delayno >= 0x40000000)
-                return FALSE;
+                return u32Count;
         }
         pu8RxBuf[u32Count] = uart->RBR;    /* Get Data from UART RX  */
     }
@@ -254,7 +254,7 @@ uint32_t UART_Read(UART_T* uart, uint8_t *pu8RxBuf, uint32_t u32ReadBytes)
  *    @brief        Set UART line configuration
  *
  *    @param[in]    uart            The pointer of the specified UART module.
- *    @param[in]    u32baudrate     The register value of baudrate of UART module.
+ *    @param[in]    u32baudrate     The baudrate of UART module.
  *                                  If u32baudrate = 0, UART baudrate will not change.
  *    @param[in]    u32data_width   The data length of UART module.
  *                                  - UART_WORD_LEN_5
@@ -403,7 +403,7 @@ void UART_SelectRS485Mode(UART_T* uart, uint32_t u32Mode, uint32_t u32Addr)
     /* Select UART RS485 function mode */
     uart->FUN_SEL = UART_FUNC_SEL_RS485;
 
-    /* Set RS585 configuration */
+    /* Set RS485 configuration */
     uart->ALT_CSR &= ~(UART_ALT_CSR_RS485_NMM_Msk | UART_ALT_CSR_RS485_AUD_Msk | UART_ALT_CSR_RS485_AAD_Msk | UART_ALT_CSR_ADDR_MATCH_Msk);
     uart->ALT_CSR |= (u32Mode | (u32Addr << UART_ALT_CSR_ADDR_MATCH_Pos));
 }
@@ -427,11 +427,11 @@ uint32_t UART_Write(UART_T* uart, uint8_t *pu8TxBuf, uint32_t u32WriteBytes)
     for(u32Count = 0; u32Count != u32WriteBytes; u32Count++)
     {
         u32delayno = 0;
-        while((uart->FSR & UART_FSR_TE_FLAG_Msk) == 0)   /* Wait Tx empty and Time-out manner */
+        while(uart->FSR & UART_FSR_TX_FULL_Msk)   /* Wait Tx not full or Time-out manner */
         {
             u32delayno++;
             if(u32delayno >= 0x40000000)
-                return FALSE;
+                return u32Count;
         }
         uart->THR = pu8TxBuf[u32Count];    /* Send UART Data from buffer */
     }
