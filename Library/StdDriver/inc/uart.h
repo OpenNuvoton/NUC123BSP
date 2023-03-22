@@ -92,7 +92,7 @@ extern "C"
 #define UART_FUNC_SEL_RS485   (0x3 << UART_FUN_SEL_FUN_SEL_Pos) /*!< UA_FUNC_SEL setting to set RS485 Function           */
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* UART BAUDRATE MODE constants definitions                                                                       */
+/* UART BAUDRATE MODE constants definitions                                                                */
 /*---------------------------------------------------------------------------------------------------------*/
 #define UART_BAUD_MODE0     (0) /*!< Set UART Baudrate Mode is Mode0 */
 #define UART_BAUD_MODE2     (UART_BAUD_DIV_X_EN_Msk | UART_BAUD_DIV_X_ONE_Msk) /*!< Set UART Baudrate Mode is Mode2 */
@@ -302,7 +302,7 @@ extern "C"
  *                              - UART_IER_RDA_IEN_Msk      : Rx ready interrupt
  *    @return       None
  *
- *    @details      This macro enable specified UART interrupt.
+ *    @details      This macro disable specified UART interrupt.
  */
 #define UART_DISABLE_INT(uart, u32eIntSel)    ((uart)->IER &= ~ (u32eIntSel))
 
@@ -336,7 +336,7 @@ extern "C"
  *                                  - UART_ISR_RDA_IF_Msk           : Rx Ready Interrupt Flag
  *
  *    @retval       0 The specified interrupt is not happened.
- *                  1 The specified interrupt is happened.
+ *    @retval       1 The specified interrupt is happened.
  *
  *    @details      This macro get specified interrupt flag or interrupt indicator status.
  */

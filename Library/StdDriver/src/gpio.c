@@ -71,7 +71,7 @@ void GPIO_SetMode(GPIO_T *port, uint32_t u32PinMask, uint32_t u32Mode)
  *                              - \ref GPIO_INT_RISING 
  *                              - \ref GPIO_INT_FALLING 
  *                              - \ref GPIO_INT_BOTH_EDGE
- *                              - \ref GPIO_INT_HIGH 
+ *                              - \ref GPIO_INT_HIGH
  *                              - \ref GPIO_INT_LOW
  *
  * @return      None
@@ -80,8 +80,11 @@ void GPIO_SetMode(GPIO_T *port, uint32_t u32PinMask, uint32_t u32Mode)
  */
 void GPIO_EnableInt(GPIO_T *port, uint32_t u32Pin, uint32_t u32IntAttribs)
 {
-    port->IMD |= (((u32IntAttribs >> 24) & 0xFFUL) << u32Pin);
-    port->IEN |= ((u32IntAttribs & 0xFFFFFFUL) << u32Pin);
+    /* Configure interrupt mode of specified pin */
+    port->IMD = (port->IMD & ~(1ul << u32Pin)) | (((u32IntAttribs >> 24) & 0xFFUL) << u32Pin);
+
+    /* Enable interrupt function of specified pin */
+    port->IEN = (port->IEN & ~(0x00010001ul << u32Pin)) | ((u32IntAttribs & 0xFFFFFFUL) << u32Pin);
 }
 
 
@@ -94,15 +97,18 @@ void GPIO_EnableInt(GPIO_T *port, uint32_t u32Pin, uint32_t u32IntAttribs)
  *                          It could be 0 ~ 10 and 12 ~ 15 for PB GPIO port. \n
  *                          It could be 0 ~ 5 and 8 ~ 13 for PC GPIO port. \n
  *                          It could be 0 ~ 5 and 8 ~ 11 for PD GPIO port. \n
- *                          It could be 0 ~ 3 for PF GPIO port.  
+ *                          It could be 0 ~ 3 for PF GPIO port.
  *
  * @return      None
  *
- * @details     This function is used to enable specified GPIO pin interrupt.
+ * @details     This function is used to disable specified GPIO pin interrupt.
  */
 void GPIO_DisableInt(GPIO_T *port, uint32_t u32Pin)
 {
+    /* Configure interrupt mode of specified pin */
     port->IMD &= ~(1UL << u32Pin);
+
+    /* Disable interrupt function of specified pin */
     port->IEN &= ~((0x00010001UL) << u32Pin);
 }
 
