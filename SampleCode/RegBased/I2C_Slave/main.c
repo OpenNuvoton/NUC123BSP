@@ -8,8 +8,9 @@
  *           This sample code is EEPROM like, only support 256 bytes.
  *           Needs to work with I2C_Master sample code.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

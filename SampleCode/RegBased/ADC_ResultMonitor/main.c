@@ -7,8 +7,9 @@
  *           Demonstrate how to use the digital compare function to monitor the conversion result of channel 2.
  *
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -229,7 +230,7 @@ void ADC_IRQHandler(void)
 /*---------------------------------------------------------------------------------------------------------*/
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
-main(void)
+int main(void)
 {
 
     /* Unlock protected registers */

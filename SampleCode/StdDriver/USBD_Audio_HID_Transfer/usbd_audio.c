@@ -5,7 +5,8 @@
  * @date     23, December, 2013
  *
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 
 /*!<Includes */

@@ -4,7 +4,8 @@
  *           Demonstrate how to implement a USB Mass-Storage.
  *           It uses embedded data flash as storage.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

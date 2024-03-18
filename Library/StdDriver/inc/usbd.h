@@ -6,8 +6,8 @@
  * @brief    NUC123 series USB driver header file
  *
  * @note
- * SPDX-License-Identifier: Apache-2.0
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 
 #ifndef __USBD_H__

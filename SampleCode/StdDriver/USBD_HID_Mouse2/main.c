@@ -5,7 +5,8 @@
  *           It use PC0 ~ PC5 to control mouse direction and mouse key.
  *           It also supports USB suspend and remote wakeup.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

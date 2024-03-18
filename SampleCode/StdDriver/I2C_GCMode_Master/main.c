@@ -7,8 +7,9 @@
  *           Demonstrate how a Master uses I2C address 0x0 to write data to I2C Slave.
  *           Needs to work with I2C_GCMode_Slave sample code.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

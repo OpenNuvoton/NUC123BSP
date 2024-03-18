@@ -7,8 +7,9 @@
  *           Demonstrate how to use single mode and finishes the conversion of the specified channel.
  *
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -199,7 +200,7 @@ void ADC_IRQHandler(void)
 /*---------------------------------------------------------------------------------------------------------*/
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
-main(void)
+int main(void)
 {
 
     /* Unlock protected registers */

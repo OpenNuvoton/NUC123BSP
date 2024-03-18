@@ -7,8 +7,9 @@
  *           Demonstrate how to communicate with an off-chip SPI slave device with Dual I/O mode and FIFO mode.
  *           This sample code needs to work with SPI_SlaveDualIOMode sample code.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

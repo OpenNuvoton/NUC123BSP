@@ -3,7 +3,8 @@
  * @brief    NUC123 series USB composite device header file
  *
  * @note
- * Copyright (C) 2014 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #ifndef __USBD_PRINTER_H__
 #define __USBD_PRINTER_H__

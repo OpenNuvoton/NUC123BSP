@@ -5,7 +5,8 @@
  * $Date: 16/06/08 1:30p $
  * @brief    Demonstrate how to imeplement software debounce with GPIO interrupt and timer.
  * @note
- * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

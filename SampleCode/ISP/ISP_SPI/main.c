@@ -3,7 +3,8 @@
  * @brief    ISP tool main function
  * @version  2.0.0
  *
- * Copyright (C) 2019 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -12,6 +13,9 @@
 
 #define PLLCON_SETTING  CLK_PLLCON_72MHz_HIRC
 #define PLL_CLOCK       71884800
+
+void ProcessHardFault(void){}
+void SH_Return(void){}
 
 uint32_t TIMER_Open(TIMER_T *timer, uint32_t u32Mode, uint32_t u32Freq)
 {

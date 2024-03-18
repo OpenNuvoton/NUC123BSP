@@ -6,9 +6,9 @@
  * @brief    NUC123 Series Clock Control Driver Header File
  *
  * @note
- * SPDX-License-Identifier: Apache-2.0
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #ifndef __CLK_H__
 #define __CLK_H__

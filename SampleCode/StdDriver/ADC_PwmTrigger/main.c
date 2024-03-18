@@ -5,8 +5,9 @@
  * $Date: 15/07/02 11:18a $
  * @brief    Demonstrate how to trigger ADC by PWM.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -157,7 +158,7 @@ void ADC_PWMTrigTest_SingleOpMode()
     /* Clear the ADC interrupt flag */
     ADC_CLR_INT_FLAG(ADC, ADC_ADF_INT);
 
-    printf("Channel 2: 0x%X\n", ADC_GET_CONVERSION_DATA(ADC, 2));
+    printf("Channel 2: 0x%X\n", (unsigned int)ADC_GET_CONVERSION_DATA(ADC, 2));
 
     /* Disable ADC */
     ADC_POWER_DOWN(ADC);
@@ -173,7 +174,7 @@ void ADC_PWMTrigTest_SingleOpMode()
 /*---------------------------------------------------------------------------------------------------------*/
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
-main(void)
+int32_t main(void)
 {
 
     /* Unlock protected registers */

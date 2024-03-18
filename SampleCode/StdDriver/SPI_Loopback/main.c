@@ -5,7 +5,7 @@
  *           SPI1 will be configured as Master mode and SPI0 will be configured as Slave mode.
  *
  * @copyright SPDX-License-Identifier: Apache-2.0
- * @copyright Copyright (C) 2023 Nuvoton Technology Corp. All rights reserved.
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -121,7 +121,7 @@ int main(void)
             /* Read received data */
             s_au32DestinationData[u32DataCount] = SPI_READ_RX0(SPI1);
             u32DataCount++;
-            if(u32DataCount > TEST_COUNT)
+            if(u32DataCount >= TEST_COUNT)
                 break;
         }
 

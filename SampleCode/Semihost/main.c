@@ -5,16 +5,20 @@
  * $Date: 15/11/02 10:00a $
  * @brief    A sample code to show how to debug with semihost message print.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 
 #include <stdio.h>
 #include "NUC123.h"
-
-# if defined (__GNUC__)
-    extern void initialise_monitor_handles(void);
+#if (defined (__GNUC__) && (!(defined(__ARMCC_VERSION))))
+extern void initialise_monitor_handles(void);
 #endif
+
+
+void ProcessHardFault(void);
+void ProcessHardFault(void){}
 /*---------------------------------------------------------------------------------------------------------*/
 /* Main Function                                                                                            */
 /*---------------------------------------------------------------------------------------------------------*/

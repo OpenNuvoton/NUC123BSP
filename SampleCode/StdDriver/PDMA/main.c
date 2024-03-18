@@ -5,8 +5,9 @@
  * $Date: 15/07/02 3:11p $
  * @brief    Demonstrate how to use PDMA channel 0 to transfer data from memory to memory.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"

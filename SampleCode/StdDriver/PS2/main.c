@@ -5,8 +5,9 @@
  * $Date: 15/07/02 11:18a $
  * @brief    Demonstrate how to control PS/2 mouse movement on the screen.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -209,7 +210,7 @@ void PS2_IRQHandler(void)
 
                     g_cmd[0] = 0;
 
-                    printf("(PS2->STATUS).TXEMPTY is (%0x)\n", ((PS2_GET_STATUS() & PS2_PS2STATUS_TXEMPTY_Msk) >> PS2_PS2STATUS_TXEMPTY_Pos));
+                    printf("(PS2->STATUS).TXEMPTY is (%0x)\n", (unsigned int)((PS2_GET_STATUS() & PS2_PS2STATUS_TXEMPTY_Msk) >> PS2_PS2STATUS_TXEMPTY_Pos));
 
                     /* Wait Tx ready */
                     if(PS2_GET_STATUS() & PS2_PS2STATUS_TXEMPTY_Msk)

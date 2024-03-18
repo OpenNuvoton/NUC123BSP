@@ -7,8 +7,9 @@
  *           Demonstrate how to set I2C to wake-up MCU from power-down mode.
  *           Needs to work with I2C_Wakeup_Master sample code.
  * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #include <stdio.h>
 #include "NUC123.h"
@@ -312,7 +313,7 @@ int32_t main(void)
     CLK_PowerDown();
 
     while((g_u8SlvPWRDNWK & g_u8SlvI2CWK) == 0);    
-    printf("Power-down Wake-up INT 0x%x\n", ((CLK->PWRCON) & CLK_PWRCON_PD_WU_STS_Msk));		
+    printf("Power-down Wake-up INT 0x%x\n", (unsigned int)((CLK->PWRCON) & CLK_PWRCON_PD_WU_STS_Msk));		
     printf("I2C0 WAKE INT 0x%x\n", I2C0->I2CWKUPSTS);
 		
     /* Disable power wake-up interrupt */

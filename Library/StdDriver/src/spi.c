@@ -6,8 +6,8 @@
  * @brief    NUC123 series SPI driver source file
  *
  * @note
- * SPDX-License-Identifier: Apache-2.0
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 #include "NUC123.h"
 /** @addtogroup Standard_Driver Standard Driver
@@ -345,8 +345,8 @@ uint32_t SPI_SetBusClock(SPI_T *spi, uint32_t u32BusClock)
   */
 void SPI_EnableFIFO(SPI_T *spi, uint32_t u32TxThreshold, uint32_t u32RxThreshold)
 {
-    spi->FIFO_CTL = (spi->FIFO_CTL & ~(SPI_FIFO_CTL_TX_THRESHOLD_Msk | SPI_FIFO_CTL_RX_THRESHOLD_Msk) |
-                     (u32TxThreshold << SPI_FIFO_CTL_TX_THRESHOLD_Pos) |
+    spi->FIFO_CTL = (spi->FIFO_CTL & ~(SPI_FIFO_CTL_TX_THRESHOLD_Msk | SPI_FIFO_CTL_RX_THRESHOLD_Msk)) |
+                     ((u32TxThreshold << SPI_FIFO_CTL_TX_THRESHOLD_Pos) |
                      (u32RxThreshold << SPI_FIFO_CTL_RX_THRESHOLD_Pos));
 
     spi->CNTRL |= SPI_CNTRL_FIFO_Msk;
