@@ -28,7 +28,7 @@ volatile uint8_t g_u8IsTargetAbortINTFlag = 0, g_u8IsBlockTransferDoneINTFlag = 
  *
  * @return      None
  *
- * @details     The PDMA_IRQHandler is default IRQ of PDMA and CRC, declared in startup_NUC123Series.s.
+ * @details     The PDMA_IRQHandler is default IRQ of PDMA and CRC, declared in startup_NUC123.s.
  */
 void PDMA_IRQHandler(void)
 {

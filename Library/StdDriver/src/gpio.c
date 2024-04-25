@@ -34,10 +34,10 @@
  *                          It could be BIT0 ~ BIT5 and BIT8 ~ BIT13 for PC GPIO port. \n
  *                          It could be BIT0 ~ BIT5 and BIT8 ~ BIT11 for PD GPIO port. \n
  *                          It could be BIT0 ~ BIT3 for PF GPIO port.
- * @param[in]   u32Mode     Operation mode. It could be : 
-  *                         - \ref GPIO_PMD_INPUT, 
- *                          - \ref GPIO_PMD_OUTPUT, 
- *                          - \ref GPIO_PMD_OPEN_DRAIN,
+ * @param[in]   u32Mode     Operation mode. It could be :
+ *                          - \ref GPIO_PMD_INPUT
+ *                          - \ref GPIO_PMD_OUTPUT
+ *                          - \ref GPIO_PMD_OPEN_DRAIN
  *                          - \ref GPIO_PMD_QUASI
  *
  * @return      None

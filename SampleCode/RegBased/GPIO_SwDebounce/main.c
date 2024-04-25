@@ -38,8 +38,8 @@ void SYS_Init(void)
     CLK->CLKDIV = (CLK->CLKDIV & (~CLK_CLKDIV_HCLK_N_Msk)) | CLK_CLKDIV_HCLK(1);
 
     /* Set PLL to power down mode and PLL_STB bit in CLKSTATUS register will be cleared by hardware */
-    CLK->PLLCON |= CLK_PLLCON_PD_Msk;        
-    
+    CLK->PLLCON |= CLK_PLLCON_PD_Msk;
+
     /* Enable external XTAL 12MHz clock */
     CLK->PWRCON |= CLK_PWRCON_XTL12M_EN_Msk;
 
@@ -52,7 +52,7 @@ void SYS_Init(void)
     CLK->CLKSEL0 = (CLK->CLKSEL0 & (~CLK_CLKSEL0_HCLK_S_Msk)) | CLK_CLKSEL0_HCLK_S_PLL;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     //SystemCoreClockUpdate();
     PllClock        = PLL_CLOCK;            // PLL
     SystemCoreClock = PLL_CLOCK / 1;        // HCLK
@@ -75,7 +75,7 @@ void SYS_Init(void)
 
 }
 
-void UART0_Init()
+void UART0_Init(void)
 {
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init UART                                                                                               */
@@ -95,13 +95,13 @@ void UART0_Init()
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
-    
+
     /* Unlock protected registers */
     SYS_UnlockReg();
 
     /* Init System, peripheral clock and multi-function I/O */
     SYS_Init();
-    
+
 
     /* Init UART0 for printf */
     UART0_Init();
@@ -111,16 +111,16 @@ int main(void)
     printf("|             GPIO Software De-bounce Sample Code            |\n");
     printf("+------------------------------------------------------------+\n");
     printf("De-bounce GPIO PC.8 input signal and output to GPIO PC.9.\n");
-    printf("Toogle PC.8 and test.\n\n");
+    printf("Toggle PC.8 and test.\n\n");
 
 
-    /* Configure PC.9 as Output mode */ 
+    /* Configure PC.9 as Output mode */
     PC->PMD = (PC->PMD & (~GPIO_PMD_PMD9_Msk)) | (GPIO_PMD_OUTPUT << GPIO_PMD_PMD9_Pos);
 
     DBNCE_Init();
 
 
-    /* Software de-bounce samople code */
+    /* Software de-bounce sample code */
     while(1)
     {
         PC9 = g_u32Debounce;

@@ -145,7 +145,7 @@ void SYS_Init(void)
                    CLK_CLKSEL1_TMR0_S_HXT | CLK_CLKSEL1_TMR1_S_HCLK | CLK_CLKSEL1_TMR2_S_HIRC | CLK_CLKSEL1_TMR3_S_LIRC;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -252,12 +252,14 @@ int main(void)
                     (g_au32TMRINTCount[3] > (g_au32TMRINTCount[0] * 8 + u32InitCount)) || (g_au32TMRINTCount[3] < (g_au32TMRINTCount[0] * 8 - u32InitCount)))
             {
                 printf("*** FAIL ***\n");
-                while(1);
+                goto lexit;
             }
         }
     }
 
     printf("*** PASS ***\n");
+
+lexit:
 
     while(1);
 }

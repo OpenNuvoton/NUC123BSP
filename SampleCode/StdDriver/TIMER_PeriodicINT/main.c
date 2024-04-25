@@ -239,12 +239,14 @@ int main(void)
                     (g_au32TMRINTCount[3] > (g_au32TMRINTCount[0] * 8 + u32InitCount)) || (g_au32TMRINTCount[3] < (g_au32TMRINTCount[0] * 8 - u32InitCount)))
             {
                 printf("*** FAIL ***\n");
-                while(1);
+                goto lexit;
             }
         }
     }
 
     printf("*** PASS ***\n");
+
+lexit:
 
     while(1);
 }

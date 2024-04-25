@@ -28,7 +28,7 @@ volatile uint8_t g_u8IsTargetAbortINTFlag = 0, g_u8IsBlockTransferDoneINTFlag = 
  *
  * @return      None
  *
- * @details     The PDMA_IRQHandler is default IRQ of PDMA and CRC, declared in startup_NUC123Series.s.
+ * @details     The PDMA_IRQHandler is default IRQ of PDMA and CRC, declared in startup_NUC123.s.
  */
 void PDMA_IRQHandler(void)
 {
@@ -96,7 +96,7 @@ void SYS_Init(void)
     CLK->CLKSEL1 = CLK_CLKSEL1_UART_S_PLL;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -142,9 +142,9 @@ int main(void)
     UART0_Init();
 
     printf("\n\nCPU @ %dHz\n", SystemCoreClock);
-    printf("+--------------------------------+\n");
+    printf("+---------------------------------+\n");
     printf("|    CRC CCITT Mode Sample Code   |\n");
-    printf("+--------------------------------+\n\n");
+    printf("+---------------------------------+\n\n");
 
     printf("# Calculate string \"123456789\" CRC-CCITT checksum value by CRC DMA mode.\n");
     printf("    - Seed value is 0xFFFF          \n");

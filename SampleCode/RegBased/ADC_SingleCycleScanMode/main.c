@@ -59,11 +59,11 @@ void SYS_Init(void)
     CLK->CLKSEL0 |= CLK_CLKSEL0_HCLK_S_PLL;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     //SystemCoreClockUpdate();
     PllClock        = PLL_CLOCK;            // PLL
     SystemCoreClock = PLL_CLOCK / 1;        // HCLK
-    CyclesPerUs     = PLL_CLOCK / 1000000;  // For SYS_SysTickDelay()
+    CyclesPerUs     = PLL_CLOCK / 1000000;  // For CLK_SysTickDelay()
 
     /* Enable UART module clock */
     CLK->APBCLK |= CLK_APBCLK_UART0_EN_Msk;
@@ -133,6 +133,7 @@ void AdcSingleCycleScanModeTest()
     uint8_t  u8Option;
     uint32_t u32ChannelCount;
     int32_t  i32ConversionData;
+    uint32_t u32TimeOutCnt;
 
     printf("\n");
     printf("+----------------------------------------------------------------------+\n");
@@ -159,7 +160,14 @@ void AdcSingleCycleScanModeTest()
             ADC->ADCR |= ADC_ADCR_ADST_Msk;
 
             /* Wait conversion done */
-            while(!((ADC->ADSR & ADC_ADSR_ADF_Msk) >> ADC_ADSR_ADF_Pos));
+            u32TimeOutCnt = SystemCoreClock; /*1 second time-out */
+            while(!((ADC->ADSR & ADC_ADSR_ADF_Msk) >> ADC_ADSR_ADF_Pos))
+            {
+                if(--u32TimeOutCnt == 0) {
+                    printf("Wait for ADC conversion done time-out!\n");
+                    return;
+                }
+            }
 
             for(u32ChannelCount = 0; u32ChannelCount < 4; u32ChannelCount++)
             {

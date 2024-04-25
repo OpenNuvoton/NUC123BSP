@@ -242,7 +242,7 @@ void I2C0_Close(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void)
 {
-    uint32_t i;
+    uint32_t i, u32TimeOutCnt;
 
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -308,8 +308,10 @@ int32_t main(void)
         if(g_u8SlvTRxAbortFlag)
         {
             g_u8SlvTRxAbortFlag = 0;
+            u32TimeOutCnt = I2C_TIMEOUT;
+            while(I2C0->I2CON & I2C_I2CON_SI_Msk)
+                if(--u32TimeOutCnt == 0) break;
 
-            while(I2C0->I2CON & I2C_I2CON_SI_Msk);
             printf("I2C Slave re-start. status[0x%x]\n", I2C0->I2CSTATUS);
             I2C_SET_CONTROL_REG(I2C0, I2C_I2CON_SI_AA);
         }

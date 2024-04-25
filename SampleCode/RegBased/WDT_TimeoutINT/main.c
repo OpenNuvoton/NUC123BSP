@@ -86,7 +86,7 @@ void SYS_Init(void)
     CLK->CLKSEL1 = CLK_CLKSEL1_UART_S_PLL | CLK_CLKSEL1_WDT_S_LIRC;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -140,7 +140,7 @@ int main(void)
     printf("# When WDT start counting, system will generate a WDT time-out interrupt after around 1.6384 s.\n");
     printf("  Measure PA.10 period time to check time-out interval.\n\n");
 
-    /* Use PA.0 to check time-out period time */
+    /* Use PA.10 to check time-out period time */
     PA->PMD = 0xFFDFFFFF;
     PA10 = 1;
     PA10 = 0;

@@ -21,7 +21,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Define functions prototype                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/
-int main(void);
+int32_t main(void);
 void UART_CTSWakeUpTest(void);
 
 
@@ -29,7 +29,7 @@ void UART_CTSWakeUpTest(void);
 /* ISR to handle UART Channel 1 interrupt event                                                            */
 /*---------------------------------------------------------------------------------------------------------*/
 void UART1_IRQHandler(void)
-{    
+{
     if(UART_GET_INT_FLAG(UART1, UART_ISR_MODEM_INT_Msk))    /* UART Modem Status interrupt flag */
     {
         printf("UART Modem Status interrupt happen.");
@@ -42,8 +42,12 @@ void UART1_IRQHandler(void)
 /*---------------------------------------------------------------------------------------------------------*/
 void PowerDownFunction(void)
 {
+    uint32_t u32TimeOutCnt;
+
     /* Check if all the debug messages are finished */
-    UART_WAIT_TX_EMPTY(UART0);
+    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    UART_WAIT_TX_EMPTY(UART0)
+        if(--u32TimeOutCnt == 0) break;
 
     /* Enter to Power-down mode */
     CLK_PowerDown();
@@ -58,8 +62,8 @@ void UART_CTSWakeUpTest(void)
 
     printf("+----------------------------------------------------------+\n");
     printf("|   Power-Down and Wake-up by UART interrupt Sample Code   |\n");
-    printf("+----------------------------------------------------------+\n\n");    
-    
+    printf("+----------------------------------------------------------+\n\n");
+
     /* Clear Modem Status interrupt before entering Power-down mode */
     UART_ClearIntFlag(UART1, UART_ISR_MODEM_INT_Msk);
 
@@ -73,16 +77,16 @@ void UART_CTSWakeUpTest(void)
     SYS_UnlockReg();
 
     /* Enter to Power-down mode */
-    PowerDownFunction(); 
+    PowerDownFunction();
 
     /* Lock protected registers after entering Power-down mode */
     SYS_LockReg();
 
     /* Disable UART Wake-up function and Modem Status interrupt */
     UART_DisableInt(UART1, UART_IER_WAKE_EN_Msk|UART_IER_MODEM_IEN_Msk);
-       
-    printf("\nSystem waken-up done.\n");       
-    printf("\nUART Sample Program End.\n");    
+
+    printf("\nSystem waken-up done.\n");
+    printf("\nUART Sample Program End.\n");
 
 }
 
@@ -121,7 +125,7 @@ void SYS_Init(void)
     /* Select UART module clock source */
     CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART_S_HXT, CLK_CLKDIV_UART(1));
     CLK_SetModuleClock(UART1_MODULE, CLK_CLKSEL1_UART_S_HXT, CLK_CLKDIV_UART(1));
-    
+
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init I/O Multi-function                                                                                 */
     /*---------------------------------------------------------------------------------------------------------*/
@@ -129,13 +133,13 @@ void SYS_Init(void)
     /* Set GPB multi-function pins for UART0 RXD(PB.0) and TXD(PB.1) */
     /* Set GPB multi-function pins for UART1 RXD(PB.4), TXD(PB.5) and nCTS(PB.7) */
 
-    SYS->GPB_MFP &= ~(SYS_GPB_MFP_PB0_Msk | SYS_GPB_MFP_PB1_Msk | 
+    SYS->GPB_MFP &= ~(SYS_GPB_MFP_PB0_Msk | SYS_GPB_MFP_PB1_Msk |
                       SYS_GPB_MFP_PB4_Msk | SYS_GPB_MFP_PB5_Msk | SYS_GPB_MFP_PB7_Msk);
-    SYS->GPB_MFP |= (SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD | 
+    SYS->GPB_MFP |= (SYS_GPB_MFP_PB0_UART0_RXD | SYS_GPB_MFP_PB1_UART0_TXD |
                      SYS_GPB_MFP_PB4_UART1_RXD | SYS_GPB_MFP_PB5_UART1_TXD | SYS_GPB_MFP_PB7_UART1_nCTS);
 
     SYS->ALT_MFP &= ~(SYS_ALT_MFP_PB4_Msk | SYS_ALT_MFP_PB5_Msk | SYS_ALT_MFP_PB7_Msk);
-    SYS->ALT_MFP |= (SYS_ALT_MFP_PB4_UART1_RXD | SYS_ALT_MFP_PB5_UART1_TXD | SYS_ALT_MFP_PB7_UART1_nCTS);    
+    SYS->ALT_MFP |= (SYS_ALT_MFP_PB4_UART1_RXD | SYS_ALT_MFP_PB5_UART1_TXD | SYS_ALT_MFP_PB7_UART1_nCTS);
 
 }
 
@@ -168,8 +172,8 @@ void UART1_Init()
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
 
-int main(void)
-{       
+int32_t main(void)
+{
     /* Unlock protected registers */
     SYS_UnlockReg();
 
@@ -195,7 +199,7 @@ int main(void)
 
     /* UART wake-up sample function */
     UART_CTSWakeUpTest();
-    
+
     while(1);
 }
 

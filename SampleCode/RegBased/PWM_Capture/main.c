@@ -55,19 +55,27 @@ void PWMA_IRQHandler(void)
 /* The capture internal counter down count from 0x10000, and reload to 0x10000 after    */
 /* input signal falling happens (Time B/C/D)                                            */
 /*--------------------------------------------------------------------------------------*/
-void CalPeriodTime()
+int32_t CalPeriodTime(void)
 {
     uint16_t u32Count[4];
     uint32_t u32i;
     uint16_t u16RisingTime, u16FallingTime, u16HighPeriod, u16LowPeriod, u16TotalPeriod;
+    uint32_t u32TimeOutCnt;
 
     /* Clear Capture Falling Indicator (Time A) */
     PWMA->CCR0 = (PWMA->CCR0 & PWM_CCR_MASK) | PWM_CCR0_CFLRI0_Msk;
 
-    /* Wait for Capture Falling Indicator  */
-    while((PWMA->CCR0 >> PWM_CCR0_CFLRI0_Pos & 1) == 0);
+    /* Wait for Capture Falling Indicator */
+    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    while((PWMA->CCR0 >> PWM_CCR0_CFLRI0_Pos & 1) == 0)
+    {
+        if(--u32TimeOutCnt == 0) {
+            printf("Wait for PWM Capture Falling Indicator time-out!\n");
+            return -1;
+        }
+    }
 
-    /* Clear Capture Falling Indicator (Time B)*/
+    /* Clear Capture Falling Indicator (Time B) */
     PWMA->CCR0 = (PWMA->CCR0 & PWM_CCR_MASK) | PWM_CCR0_CFLRI0_Msk;
 
     u32i = 0;
@@ -75,7 +83,14 @@ void CalPeriodTime()
     while(u32i < 4)
     {
         /* Wait for Capture Falling Indicator */
-        while((PWMA->CCR0 >> PWM_CCR0_CFLRI0_Pos & 1) == 0);
+        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+        while((PWMA->CCR0 >> PWM_CCR0_CFLRI0_Pos & 1) == 0)
+        {
+            if(--u32TimeOutCnt == 0) {
+                printf("Wait for PWM Capture Falling Indicator time-out!\n");
+                return -1;
+            }
+        }
 
         /* Clear Capture Falling and Rising Indicator */
         PWMA->CCR0 = (PWMA->CCR0 & PWM_CCR_MASK) | (PWM_CCR0_CFLRI0_Msk | PWM_CCR0_CRLRI0_Msk);
@@ -84,7 +99,14 @@ void CalPeriodTime()
         u32Count[u32i++] = PWMA->CFLR0;
 
         /* Wait for Capture Rising Indicator */
-        while((PWMA->CCR0 >> PWM_CCR0_CRLRI0_Pos & 1) == 0);
+        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+        while((PWMA->CCR0 >> PWM_CCR0_CRLRI0_Pos & 1) == 0)
+        {
+            if(--u32TimeOutCnt == 0) {
+                printf("Wait for PWM Capture Rising Indicator time-out!\n");
+                return -1;
+            }
+        }
 
         /* Clear Capture Rising Indicator */
         PWMA->CCR0 = (PWMA->CCR0 & PWM_CCR_MASK) | PWM_CCR0_CRLRI0_Msk;
@@ -107,9 +129,15 @@ void CalPeriodTime()
     printf("\ncapture Result: Rising Time = %d, Falling Time = %d \nHigh Period = %d, Low Period = %d, Total Period = %d.\n\n",
            u16RisingTime, u16FallingTime, u16HighPeriod, u16LowPeriod, u16TotalPeriod);
     if((u16HighPeriod < 7199) || (u16HighPeriod > 7201) || (u16LowPeriod < 16799) || (u16LowPeriod > 16801) || (u16TotalPeriod < 23999) || (u16TotalPeriod > 24001))
+    {
         printf("Capture Test Fail!!\n");
+        return -1;
+    }
     else
+    {
         printf("Capture Test Pass!!\n");
+        return 0;
+    }
 }
 
 void SYS_Init(void)
@@ -124,10 +152,10 @@ void SYS_Init(void)
     /* Waiting for Internal RC clock ready */
     while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_OSC22M_STB_Msk));
 
-    /* Switch HCLK clock source to Internal RC and and HCLK source divide 1 */
+    /* Switch HCLK clock source to Internal RC and HCLK source divide 1 */
     CLK->CLKSEL0 = (CLK->CLKSEL0 & ~CLK_CLKSEL0_HCLK_S_Msk) | CLK_CLKSEL0_HCLK_S_HIRC;
     CLK->CLKDIV &= ~CLK_CLKDIV_HCLK_N_Msk;
-    CLK->CLKDIV |= (CLK_CLKDIV_HCLK(1) << CLK_CLKDIV_HCLK_N_Pos);
+    CLK->CLKDIV |= CLK_CLKDIV_HCLK(1);
 
     /* Enable XT1_OUT(PF.0) and XT1_IN(PF.1) */
     SYS->GPF_MFP &= ~(SYS_GPF_MFP_PF0_Msk | SYS_GPF_MFP_PF1_Msk);
@@ -145,11 +173,11 @@ void SYS_Init(void)
     CLK->CLKSEL0 = (CLK->CLKSEL0 & ~CLK_CLKSEL0_HCLK_S_Msk) | CLK_CLKSEL0_HCLK_S_PLL;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     //SystemCoreClockUpdate();
     PllClock        = PLL_CLOCK;            // PLL
     SystemCoreClock = PLL_CLOCK / 1;        // HCLK
-    CyclesPerUs     = PLL_CLOCK / 1000000;  // For SYS_SysTickDelay()
+    CyclesPerUs     = PLL_CLOCK / 1000000;  // For CLK_SysTickDelay()
 
     /* Enable IP clock */
     CLK->APBCLK = CLK_APBCLK_UART0_EN_Msk | CLK_APBCLK_PWM01_EN_Msk | CLK_APBCLK_PWM23_EN_Msk;
@@ -203,6 +231,8 @@ void UART0_Init()
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
+    uint32_t u32TimeOutCnt;
+
     /* Unlock protected registers */
     SYS_UnlockReg();
 
@@ -230,7 +260,7 @@ int main(void)
         getchar();
 
         /*--------------------------------------------------------------------------------------*/
-        /* Set the PWMA Channel 1 as PWM output function.                                               */
+        /* Set the PWMA Channel 1 as PWM output function.                                       */
         /*--------------------------------------------------------------------------------------*/
 
         /* Assume PWM output frequency is 250Hz and duty ratio is 30%, user can calculate PWM settings by follows.
@@ -269,7 +299,7 @@ int main(void)
         PWMA->PCR |= PWM_PCR_CH1EN_Msk;
 
         /*--------------------------------------------------------------------------------------*/
-        /* Set the PWMA channel 0 for capture function                                         */
+        /* Set the PWMA channel 0 for capture function                                          */
         /*--------------------------------------------------------------------------------------*/
 
         /* If input minimum frequency is 250Hz, user can calculate capture settings by follows.
@@ -305,7 +335,15 @@ int main(void)
         PWMA->PCR |= PWM_PCR_CH0EN_Msk;
 
         /* Wait until PWMA channel 0 Timer start to count */
-        while(PWMA->PDR0 == 0);
+        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+        while(PWMA->PDR0 == 0)
+        {
+            if(--u32TimeOutCnt == 0)
+            {
+                printf("Wait for PWMA channel 0 Timer start to count time-out!\n");
+                goto lexit;
+            }
+        }
 
         /* Enable capture input path for PWMA channel 0 */
         PWMA->CAPENR |= 0x1;
@@ -321,7 +359,15 @@ int main(void)
         PWMA->CNR1 = 0;
 
         /* Wait until PWMA channel 1 Timer Stop */
-        while(PWMA->PDR1 != 0);
+        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+        while(PWMA->PDR1 != 0)
+        {
+            if(--u32TimeOutCnt == 0)
+            {
+                printf("Wait for PWMA channel 1 Timer Stop time-out!\n");
+                goto lexit;
+            }
+        }
 
         /* Disable Timer for PWMA channel 1 */
         PWMA->PCR &= ~PWM_PCR_CH1EN_Msk;
@@ -341,7 +387,15 @@ int main(void)
         PWMA->CNR0 = 0;
 
         /* Wait until PWMA channel 0 current counter reach to 0 */
-        while(PWMA->PDR0 != 0);
+        u32TimeOutCnt = SystemCoreClock;  /* 1 second time-out */
+        while(PWMA->PDR0 != 0)
+        {
+            if(--u32TimeOutCnt == 0)
+            {
+                printf("Wait for PWMA channel 0 current counter reach to 0 time-out!\n");
+                goto lexit;
+            }
+        }
 
         /* Disable Timer for PWMA channel 0 */
         PWMA->PCR &= ~PWM_PCR_CH0EN_Msk;
@@ -355,6 +409,10 @@ int main(void)
         /* Disable Capture Input path for PWMA channel 0 */
         PWMA->CAPENR &= ~0x1;
     }
+
+lexit:
+
+    while(1);
 }
 
 /*** (C) COPYRIGHT 2014~2015 Nuvoton Technology Corp. ***/

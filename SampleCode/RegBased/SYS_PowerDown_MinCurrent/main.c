@@ -84,7 +84,7 @@ void PowerDownFunction(void)
  *
  * @return      None
  *
- * @details     The PA/PB default IRQ, declared in startup_NUC123Series.s.
+ * @details     The PA/PB default IRQ, declared in startup_NUC123.s.
  */
 void GPAB_IRQHandler(void)
 {
@@ -282,7 +282,7 @@ int32_t main(void)
     SYS->ALT_MFP = 0;
     SYS->ALT_MFP1 = 0;
 
-    /* Configure all GPIO as Quasi-bidirectional Mode. They ard defult output high. */
+    /* Configure all GPIO as Quasi-bidirectional Mode. They are default output high. */
     PA->PMD = 0xFFFFFFFF;
     PB->PMD = 0xFFFFFFFF;
     PC->PMD = 0xFFFFFFFF;

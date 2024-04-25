@@ -45,7 +45,7 @@ extern "C"
   */
 void SYS_ClearResetSrc(uint32_t u32Src)
 {
-    SYS->RSTSRC |= u32Src;
+    SYS->RSTSRC = u32Src;
 }
 
 /**
@@ -54,6 +54,7 @@ void SYS_ClearResetSrc(uint32_t u32Src)
   * @retval     0 System voltage is higher than BOD_VL setting or BOD_EN is 0.
   * @retval     1 System voltage is lower than BOD_VL setting.
   * @details    This function get Brown-out detector output status.
+  *             If the BOD_EN is 0, this function always return 0.
   */
 uint32_t SYS_GetBODStatus(void)
 {
@@ -140,7 +141,8 @@ void SYS_ResetCPU(void)
   *             - \ref ADC_RST
   *             - \ref I2S_RST
   * @return     None
-  * @details    This function reset selected modules.
+  * @details    This function reset selected module.
+  *             The register write-protection function should be disabled before using this function.
   */
 void SYS_ResetModule(uint32_t u32ModuleIndex)
 {
@@ -169,13 +171,10 @@ void SYS_ResetModule(uint32_t u32ModuleIndex)
 void SYS_EnableBOD(int32_t i32Mode, uint32_t u32BODLevel)
 {
     /* Enable Brown-out Detector function */
-    SYS->BODCR |= SYS_BODCR_BOD_EN_Msk;
-
     /* Enable Brown-out interrupt or reset function */
-    SYS->BODCR = (SYS->BODCR & ~SYS_BODCR_BOD_RSTEN_Msk) | i32Mode;
-
     /* Select Brown-out Detector threshold voltage */
-    SYS->BODCR = (SYS->BODCR & ~SYS_BODCR_BOD_VL_Msk) | u32BODLevel;
+    SYS->BODCR = (SYS->BODCR & ~(SYS_BODCR_BOD_RSTEN_Msk|SYS_BODCR_BOD_VL_Msk)) |
+                 (i32Mode) | (u32BODLevel) | SYS_BODCR_BOD_EN_Msk;
 }
 
 /**

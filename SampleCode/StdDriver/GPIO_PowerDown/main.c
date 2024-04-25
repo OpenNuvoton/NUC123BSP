@@ -20,8 +20,12 @@
 /*---------------------------------------------------------------------------------------------------------*/
 void PowerDownFunction(void)
 {
+    uint32_t u32TimeOutCnt;
+
     /* To check if all the debug messages are finished */
-    UART_WAIT_TX_EMPTY(UART0);
+    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    UART_WAIT_TX_EMPTY(UART0)
+        if(--u32TimeOutCnt == 0) break;
 
     SCB->SCR = 4;
 
@@ -39,7 +43,7 @@ void PowerDownFunction(void)
  *
  * @return      None
  *
- * @details     The PA/PB default IRQ, declared in startup_NUC123Series.s.
+ * @details     The PA/PB default IRQ, declared in startup_NUC123.s.
  */
 void GPAB_IRQHandler(void)
 {
@@ -102,7 +106,7 @@ void SYS_Init(void)
 
 }
 
-void UART0_Init()
+void UART0_Init(void)
 {
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init UART                                                                                               */
@@ -117,7 +121,7 @@ void UART0_Init()
 /*---------------------------------------------------------------------------------------------------------*/
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
-int main(void)
+int32_t main(void)
 {
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -143,7 +147,7 @@ int main(void)
     {
         printf("Enter to Power-Down ......\n");
         PowerDownFunction();
-        UART_WAIT_TX_EMPTY(UART0);
+
         printf("System waken-up done.\n\n");
     }
 

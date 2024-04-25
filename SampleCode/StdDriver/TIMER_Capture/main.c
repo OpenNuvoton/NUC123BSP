@@ -146,7 +146,7 @@ void UART0_Init(void)
 int main(void)
 {
     volatile uint32_t u32InitCount, u32TimeoutCount;
-    uint32_t au32CAPValus[10];;
+    uint32_t au32CAPValus[10];
 
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -213,7 +213,7 @@ int main(void)
                 if((au32CAPValus[u32InitCount] - au32CAPValus[u32InitCount - 1]) != 500)
                 {
                     printf("*** FAIL ***\n");
-                    while(1);
+                    goto lexit;
                 }
             }
             u32InitCount = g_au32TMRINTCount[2];
@@ -222,16 +222,18 @@ int main(void)
         if(u32TimeoutCount++ > SystemCoreClock / 2)
         {
             printf("Timer2 capture event time-out.\n");
-            while(1);
+            goto lexit;
         }
     }
+
+    printf("*** PASS ***\n");
+
+lexit:
 
     /* Stop Timer0, Timer1 and Timer2 counting */
     TIMER_Close(TIMER0);
     TIMER_Close(TIMER1);
     TIMER_Close(TIMER2);
-
-    printf("*** PASS ***\n");
 
     while(1);
 }

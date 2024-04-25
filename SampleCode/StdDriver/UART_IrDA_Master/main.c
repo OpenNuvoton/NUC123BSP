@@ -21,7 +21,7 @@
 /* Define functions prototype                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/
 extern char GetChar(void);
-int main(void);
+int32_t main(void);
 void IrDA_FunctionTxTest(void);
 
 
@@ -38,7 +38,7 @@ void IrDA_FunctionTxTest()
     printf("+-----------------------------------------------------------+\n");
     printf("|  ______                                          _______  |\n");
     printf("| |      |                                        |       | |\n");
-    printf("| |Master|--UART1_TXD(PB.5) <==> UART1_RXD(PB.4)--|Slave  | |\n");
+    printf("| |Master|--UART1_TXD(PB.5)      UART1_RXD(PB.4)--|Slave  | |\n");
     printf("| |      |                                        |       | |\n");
     printf("| |______|                                        |_______| |\n");
     printf("|                                                           |\n");
@@ -172,7 +172,7 @@ void UART1_Init()
 /* MAIN function                                                                                           */
 /*---------------------------------------------------------------------------------------------------------*/
 
-int main(void)
+int32_t main(void)
 {
 
     /* Unlock protected registers */

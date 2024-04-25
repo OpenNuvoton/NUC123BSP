@@ -124,11 +124,11 @@ void SYS_Init(void)
     CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART_S_HXT, CLK_CLKDIV_UART(1));
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     //SystemCoreClockUpdate();
     PllClock        = PLL_CLOCK;            // PLL
     SystemCoreClock = PLL_CLOCK / 1;        // HCLK
-    CyclesPerUs     = PLL_CLOCK / 1000000;  // For SYS_SysTickDelay()
+    CyclesPerUs     = PLL_CLOCK / 1000000;  // For CLK_SysTickDelay()
 
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init I/O Multi-function                                                                                 */
@@ -155,6 +155,8 @@ void UART0_Init()
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void)
 {
+    uint32_t u32TimeOutCnt;
+
     /* Init System, IP clock and multi-function I/O
        In the end of SYS_Init() will issue SYS_LockReg()
        to lock protected register. If user want to write
@@ -175,9 +177,9 @@ int32_t main(void)
 
     printf("\n\nCPU @ %dHz <%d>\n", SystemCoreClock, TEST_CH);
 
-    printf("+--------------------------------------+ \n");
+    printf("+-------------------------------------+ \n");
     printf("|    NUC123 PDMA Driver Sample Code   | \n");
-    printf("+--------------------------------------+ \n");
+    printf("+-------------------------------------+ \n");
 
     /* Open Channel TEST_CH */
     PDMA_Open(1 << TEST_CH);
@@ -187,7 +189,17 @@ int32_t main(void)
     NVIC_EnableIRQ(PDMA_IRQn);
     u32IsTestOver = 0xFF;
     PDMA_Trigger(TEST_CH);
-    while(u32IsTestOver == 0xFF);
+
+    /* Wait for PDMA transfer done */
+    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    while(u32IsTestOver == 0xFF)
+    {
+        if(--u32TimeOutCnt == 0)
+        {
+            printf("Wait for PDMA transfer done time-out!\n");
+            break;
+        }
+    }
 
     if(u32IsTestOver == TEST_CH)
         printf("test done...\n");

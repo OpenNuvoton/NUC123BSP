@@ -4,8 +4,8 @@
  * $Revision: 3 $
  * $Date: 16/06/21 7:36p $
  * @brief
- *           Show how to use I2C Signle byte API Read and Write data to Slave 
- *           Needs to work with I2C_Slave sample code.  
+ *           Show how to use I2C Signle byte API Read and Write data to Slave
+ *           Needs to work with I2C_Slave sample code.
  * @note
  * @copyright SPDX-License-Identifier: Apache-2.0
  *
@@ -56,7 +56,7 @@ void SYS_Init(void)
     CLK_EnableModuleClock(UART0_MODULE);
 
     /* Enable I2C0 module clock */
-    CLK_EnableModuleClock(I2C0_MODULE);   
+    CLK_EnableModuleClock(I2C0_MODULE);
 
     /* Select UART module clock source */
     CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART_S_HXT, CLK_CLKDIV_UART(1));
@@ -126,8 +126,8 @@ void I2C0_Close(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void)
 {
-    uint32_t i;
-    uint8_t u8data, u8tmp, err; 
+    uint32_t i, u32TimeOutCnt;
+    uint8_t u8data, u8tmp, err;
 
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -148,11 +148,11 @@ int32_t main(void)
     printf("+--------------------------------------------------------+\n");
     printf("| I2C Driver Sample Code for Single Byte Read/Write Test |\n");
     printf("| Needs to work with I2C_Slave sample code               |\n");
-    printf("|                                                        |\n");    
+    printf("|                                                        |\n");
     printf("|      I2C Master (I2C0) <---> I2C Slave (I2C0)          |\n");
     printf("| !! This sample code requires two borads to test !!     |\n");
     printf("+--------------------------------------------------------+\n");
-    
+
     printf("\n");
     printf("Configure I2C0 as Master\n");
     printf("The I/O connection to I2C0\n");
@@ -162,16 +162,26 @@ int32_t main(void)
     I2C0_Init();
 
     /* Slave Address */
-    g_u8DeviceAddr = 0x15; 
+    g_u8DeviceAddr = 0x15;
 
     err = 0;
-       
+
     for(i = 0; i<256; i++)
     {
-        u8tmp = (uint8_t)i+3; 
-        
-        /* Single Byte Write (Two Registers) */         
-        while(I2C_WriteByteTwoRegs(I2C0, g_u8DeviceAddr, i, u8tmp));
+        u8tmp = (uint8_t)i+3;
+
+        /* Single Byte Write (Two Registers) */
+        u32TimeOutCnt = I2C_TIMEOUT;
+        while(I2C_WriteByteTwoRegs(I2C0, g_u8DeviceAddr, i, u8tmp))
+        {
+            if(--u32TimeOutCnt == 0)
+            {
+                err = 1;
+                printf("Wait for I2C Tx time-out!\n");
+                break;
+            }
+        }
+        if(u32TimeOutCnt == 0) break;
 
         /* Single Byte Read (Two Registers) */
         u8data = I2C_ReadByteTwoRegs(I2C0, g_u8DeviceAddr, i);
@@ -180,15 +190,15 @@ int32_t main(void)
             err = 1;
             printf("%03d: Single byte write data fail,  W(0x%X)/R(0x%X) \n", i, u8tmp, u8data);
         }
-    } 
-    
+    }
+
     printf("\n");
-    
+
     if(err)
         printf("Single byte Read/Write access Fail.....\n");
     else
         printf("Single byte Read/Write access Pass.....\n");
-        
+
     while(1);
 }
 

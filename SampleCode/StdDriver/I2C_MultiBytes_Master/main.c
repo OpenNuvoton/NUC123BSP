@@ -55,8 +55,8 @@ void SYS_Init(void)
     /* Enable UART module clock */
     CLK_EnableModuleClock(UART0_MODULE);
 
-    /* Enable I2C0, I2C1 module clock */
-    CLK_EnableModuleClock(I2C0_MODULE);   
+    /* Enable I2C0 module clock */
+    CLK_EnableModuleClock(I2C0_MODULE);
 
     /* Select UART module clock source */
     CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART_S_HXT, CLK_CLKDIV_UART(1));
@@ -127,7 +127,7 @@ void I2C0_Close(void)
 int32_t main(void)
 {
     uint32_t i;
-    uint8_t txbuf[256] = {0}, rDataBuf[256] = {0};  
+    uint8_t txbuf[256] = {0}, rDataBuf[256] = {0};
 
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -148,7 +148,7 @@ int32_t main(void)
     printf("+--------------------------------------------------------+\n");
     printf("| I2C Driver Sample Code for Multi Bytes Read/Write Test |\n");
     printf("| Needs to work with I2C_Slave sample code               |\n");
-    printf("|                                                        |\n");    
+    printf("|                                                        |\n");
     printf("|      I2C Master (I2C0) <---> I2C Slave (I2C0)          |\n");
     printf("| !! This sample code requires two borads to test !!     |\n");
     printf("+--------------------------------------------------------+\n");
@@ -163,34 +163,34 @@ int32_t main(void)
 
     /* Slave address */
     g_u8DeviceAddr = 0x15;
-    
+
     /* Prepare data for transmission */
     for(i = 0; i<256; i++)
     {
         txbuf[i] = (uint8_t) i+3;
-    }     
- 
+    }
+
     for(i=0; i<256; i+=32)
     {
         /* Write 32 bytes data to Slave */
-        while(I2C_WriteMultiBytesTwoRegs(I2C0, g_u8DeviceAddr, i, &txbuf[i], 32) < 32);   
-    }      
-    
+        while(I2C_WriteMultiBytesTwoRegs(I2C0, g_u8DeviceAddr, i, &txbuf[i], 32) < 32);
+    }
+
     printf("Multi bytes Write access Pass.....\n");
-    
+
     printf("\n");
-       
-    /* Use Multi Bytes Read from Slave (Two Registers) */   
+
+    /* Use Multi Bytes Read from Slave (Two Registers) */
     while(I2C_ReadMultiBytesTwoRegs(I2C0, g_u8DeviceAddr, 0x0000, rDataBuf, 256) < 256);
 
     /* Compare TX data and RX data */
     for(i = 0; i<256; i++)
     {
         if(txbuf[i] != rDataBuf[i])
-            printf("Data compare fail... R[%d] Data: 0x%X\n", i, rDataBuf[i]); 
+            printf("Data compare fail... R[%d] Data: 0x%X\n", i, rDataBuf[i]);
     }
     printf("Multi bytes Read access Pass.....\n");
-        
+
     while(1);
 }
 

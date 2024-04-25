@@ -18,7 +18,7 @@ void SYS_Init(void)
     CLK->APBCLK = CLK_APBCLK_UART0_EN_Msk;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock and cyclesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /* Set GPB multi-function pins for UART0 RXD and TXD */

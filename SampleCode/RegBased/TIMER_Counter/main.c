@@ -94,7 +94,7 @@ void SYS_Init(void)
     CLK->CLKSEL1 = CLK_CLKSEL1_UART_S_PLL | CLK_CLKSEL1_TMR1_S_HCLK;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -166,10 +166,7 @@ int main(void)
     if(TIMER_GetCounter(TIMER1) != 0)
     {
         printf("Default counter value is not 0. (%d)\n", TIMER_GetCounter(TIMER1));
-
-        /* Stop Timer1 counting */
-        TIMER1->TCSR = 0;
-        while(1);
+        goto lexit;
     }
 
     /* To generate one counter event to T1 pin */
@@ -182,17 +179,14 @@ int main(void)
         if(u32TimeoutCount++ > SystemCoreClock / 1000)
         {
             printf("Timer1 external counter function time-out.\n");
-            while(1);
+            goto lexit;
         }
     }
 
     if(TIMER_GetCounter(TIMER1) != 1)
     {
         printf("Get unexpected counter value. (%d)\n", TIMER_GetCounter(TIMER1));
-
-        /* Stop Timer1 counting */
-        TIMER1->TCSR = 0;
-        while(1);
+        goto lexit;
     }
 
     /* To generate remains counts to T1 pin */
@@ -213,6 +207,8 @@ int main(void)
             break;
         }
     }
+
+lexit:
 
     /* Stop Timer1 counting */
     TIMER1->TCSR = 0;

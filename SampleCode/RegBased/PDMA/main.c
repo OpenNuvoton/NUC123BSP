@@ -123,7 +123,7 @@ void SYS_Init(void)
     CLK->CLKSEL1 = CLK_CLKSEL1_UART_S_PLL;
 
     /* Update System Core Clock */
-    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CycylesPerUs automatically. */
+    /* User can use SystemCoreClockUpdate() to calculate PllClock, SystemCoreClock and CyclesPerUs automatically. */
     SystemCoreClockUpdate();
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -153,6 +153,8 @@ void UART0_Init(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void)
 {
+    uint32_t u32TimeOutCnt;
+
     /* Init System, IP clock and multi-function I/O
        In the end of SYS_Init() will issue SYS_LockReg()
        to lock protected register. If user want to write
@@ -173,9 +175,9 @@ int32_t main(void)
 
     printf("\n\nCPU @ %dHz <%d>\n", SystemCoreClock, 0);
 
-    printf("+--------------------------------------+ \n");
+    printf("+-------------------------------------+ \n");
     printf("|    NUC123 PDMA Driver Sample Code   | \n");
-    printf("+--------------------------------------+ \n");
+    printf("+-------------------------------------+ \n");
 
     /* Open Channel 0 */
     PDMA_GCR->GCRCSR |= (1 << 8);
@@ -192,7 +194,17 @@ int32_t main(void)
     u32IsTestOver = 0xFF;
     /* trigger transfer */
     PDMA0->CSR |= (PDMA_CSR_TRIG_EN_Msk | PDMA_CSR_PDMACEN_Msk);
-    while(u32IsTestOver == 0xFF);
+
+    /* Wait for PDMA transfer done */
+    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    while(u32IsTestOver == 0xFF)
+    {
+        if(--u32TimeOutCnt == 0)
+        {
+            printf("Wait for PDMA transfer done time-out!\n");
+            break;
+        }
+    }
 
     if(u32IsTestOver == 0)
         printf("test done...\n");

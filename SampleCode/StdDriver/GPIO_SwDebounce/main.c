@@ -3,7 +3,7 @@
  * @version  V3.00
  * $Revision: 1 $
  * $Date: 16/06/08 1:31p $
- * @brief    Demonstrate how to imeplement software debounce with GPIO interrupt and timer.
+ * @brief    Demonstrate how to implement software debounce with GPIO interrupt and timer.
  * @note
  * @copyright SPDX-License-Identifier: Apache-2.0
  * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
@@ -80,13 +80,13 @@ void UART0_Init(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
-    
+
     /* Unlock protected registers */
     SYS_UnlockReg();
 
     /* Init System, peripheral clock and multi-function I/O */
     SYS_Init();
-    
+
 
     /* Init UART0 for printf */
     UART0_Init();
@@ -96,16 +96,16 @@ int main(void)
     printf("|             GPIO Software De-bounce Sample Code            |\n");
     printf("+------------------------------------------------------------+\n");
     printf("De-bounce GPIO PC.8 input signal and output to GPIO PC.9.\n");
-    printf("Toogle PC.8 and test.\n\n");
+    printf("Toggle PC.8 and test.\n\n");
 
 
-    /* Configure PC.9 as Output mode */ 
-    GPIO_SetMode(PC, BIT9, GPIO_PMD_OUTPUT);    
+    /* Configure PC.9 as Output mode */
+    GPIO_SetMode(PC, BIT9, GPIO_PMD_OUTPUT);
 
     DBNCE_Init();
 
 
-    /* Software de-bounce samople code */
+    /* Software de-bounce sample code */
     while(1)
     {
         PC9 = g_u32Debounce;
