@@ -41,7 +41,7 @@ void I2C0_IRQHandler(void)
     uint32_t u32Status;
 
     u32Status = I2C0->I2CSTATUS;
-    
+
     if(I2C0->I2CTOC & I2C_I2CTOC_TIF_Msk)
     {
         /* Clear I2C0 Timeout Flag */
@@ -173,7 +173,7 @@ void I2C_MasterTx(uint32_t u32Status)
 void I2C_SlaveTRx(uint32_t u32Status)
 {
     uint8_t u8data;
-    
+
     if(u32Status == 0x60)                       /* Own SLA+W has been receive; ACK has been return */
     {
         g_u8SlvDataLen = 0;
@@ -182,20 +182,20 @@ void I2C_SlaveTRx(uint32_t u32Status)
     else if(u32Status == 0x80)                 /* Previously address with own SLA address
                                                    Data has been received; ACK has been returned*/
     {
-        u8data = (unsigned char) I2C_GET_DATA(I2C1);   
-        if(g_u8SlvDataLen < 2)        
+        u8data = (unsigned char) I2C_GET_DATA(I2C1);
+        if(g_u8SlvDataLen < 2)
         {
-            g_au8SlvRxData[g_u8SlvDataLen++] = u8data;        
-            slave_buff_addr = (g_au8SlvRxData[0] << 8) + g_au8SlvRxData[1];            
+            g_au8SlvRxData[g_u8SlvDataLen++] = u8data;
+            slave_buff_addr = (g_au8SlvRxData[0] << 8) + g_au8SlvRxData[1];
         }
-        else 
+        else
         {
             g_au8SlvData[slave_buff_addr++] = u8data;
             if(slave_buff_addr==256)
             {
                 slave_buff_addr = 0;
-            }            
-        }            
+            }
+        }
 
         I2C_SET_CONTROL_REG(I2C1, I2C_I2CON_SI_AA);
     }
@@ -210,7 +210,7 @@ void I2C_SlaveTRx(uint32_t u32Status)
     {
         I2C_SET_DATA(I2C1, g_au8SlvData[slave_buff_addr++]);
         I2C_SET_CONTROL_REG(I2C1, I2C_I2CON_SI_AA);
-    }     
+    }
     else if(u32Status == 0xC0)                 /* Data byte or last data in I2CDAT has been transmitted
                                                    Not ACK has been received */
     {
@@ -237,6 +237,7 @@ void I2C_SlaveTRx(uint32_t u32Status)
 
 void SYS_Init(void)
 {
+	uint32_t u32TimeOutCnt;
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init System Clock                                                                                       */
     /*---------------------------------------------------------------------------------------------------------*/
@@ -249,7 +250,10 @@ void SYS_Init(void)
     CLK->PWRCON |= CLK_PWRCON_OSC22M_EN_Msk;
 
     /* Waiting for Internal RC clock ready */
-    while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_OSC22M_STB_Msk));
+    u32TimeOutCnt = __HIRC;
+	while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_OSC22M_STB_Msk))
+		if(--u32TimeOutCnt == 0) break;
+
 
     /* Switch HCLK clock source to Internal RC and and HCLK source divide 1 */
     CLK->CLKSEL0 &= ~CLK_CLKSEL0_HCLK_S_Msk;
@@ -261,11 +265,15 @@ void SYS_Init(void)
     CLK->PWRCON |= CLK_PWRCON_XTL12M_EN_Msk;
 
     /* Waiting for external XTAL clock ready */
-    while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk));
+    u32TimeOutCnt = __HIRC;
+	while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk))
+		if(--u32TimeOutCnt == 0) break;
 
     /* Set core clock as PLL_CLOCK from PLL */
     CLK->PLLCON = PLLCON_SETTING;
-    while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_PLL_STB_Msk));
+    u32TimeOutCnt = __HIRC;
+	while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_PLL_STB_Msk))
+		if(--u32TimeOutCnt == 0) break;
     CLK->CLKSEL0 &= (~CLK_CLKSEL0_HCLK_S_Msk);
     CLK->CLKSEL0 |= CLK_CLKSEL0_HCLK_S_PLL;
 
@@ -512,11 +520,11 @@ int32_t main(void)
 
     printf("Configure I2C0 as a Master, I2C1 as a Mlave.\n");
     printf("The I/O connection I2C0 and I2C1:\n");
-    printf("I2C0_SDA(PF.2), I2C0_SCL(PF.3)\n");    
+    printf("I2C0_SDA(PF.2), I2C0_SCL(PF.3)\n");
     printf("I2C1_SDA(PA.10), I2C1_SCL(PA.11)\n");
 
     /* Init I2C0, I2C1 */
-    I2C0_Init();    
+    I2C0_Init();
     I2C1_Init();
 
     /* I2C enter no address SLV mode */
@@ -554,6 +562,6 @@ int32_t main(void)
 
     /* Close I2C0, I2C1 */
     I2C0_Close();
-    I2C1_Close();    
+    I2C1_Close();
     while(1);
 }

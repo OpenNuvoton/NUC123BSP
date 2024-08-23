@@ -94,15 +94,15 @@ int main(void)
     printf("Press any key to start the Dual I/O input transfer.");
     getchar();
     printf("\n");
-    
+
     g_u32TxDataCount = 0;
     g_u32RxDataCount = 0;
     /* Set TX FIFO threshold, enable TX FIFO threshold interrupt and RX FIFO time-out interrupt */
     SPI0->FIFO_CTL = (2 << SPI_FIFO_CTL_TX_THRESHOLD_Pos) | SPI_FIFO_CTL_TIMEOUT_INTEN_Msk | SPI_FIFO_CTL_TX_INTEN_Msk;
-    
+
     /* Wait for transfer done */
     while(g_u32RxDataCount < TEST_COUNT);
-    
+
     /* Print the received data */
     printf("Received data:\n");
     for(u32DataCount = 0; u32DataCount < TEST_COUNT; u32DataCount++)
@@ -112,7 +112,7 @@ int main(void)
     /* Disable TX FIFO threshold interrupt and RX FIFO time-out interrupt */
     SPI0->FIFO_CTL = 0;
     NVIC_DisableIRQ(SPI0_IRQn);
-    
+
     printf("\n\nExit SPI driver sample code.\n");
 
     /* Disable SPI0 peripheral clock */
@@ -122,6 +122,7 @@ int main(void)
 
 void SYS_Init(void)
 {
+	uint32_t u32TimeOutCnt;
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init System Clock                                                                                       */
     /*---------------------------------------------------------------------------------------------------------*/
@@ -134,7 +135,9 @@ void SYS_Init(void)
     CLK->PWRCON |= CLK_PWRCON_XTL12M_EN_Msk;
 
     /* Waiting for clock ready */
-    while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk));
+    u32TimeOutCnt = __HIRC;
+	while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk))
+		if(--u32TimeOutCnt == 0) break;
 
     /* Select HXT as the clock source of HCLK */
     CLK->CLKSEL0 = (CLK->CLKSEL0 & (~CLK_CLKSEL0_HCLK_S_Msk)) | CLK_CLKSEL0_HCLK_S_HXT;
@@ -216,4 +219,3 @@ void SPI0_IRQHandler(void)
 
 
 /*** (C) COPYRIGHT 2014~2015 Nuvoton Technology Corp. ***/
-

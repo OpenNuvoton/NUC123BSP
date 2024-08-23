@@ -65,7 +65,7 @@ int main(void)
     printf("In the first stage, the SPI controller will receive %d data from a off-chip master device.\n", TEST_COUNT);
     printf("After the transfer is done, the %d received data will be printed out.\n", TEST_COUNT);
     printf("In the second stage, the SPI controller will transfer %d data to the off-chip master device.\n", TEST_COUNT);
-    
+
     for(u32TxDataCount = 0; u32TxDataCount < TEST_COUNT; u32TxDataCount++)
     {
         /* Write the initial value to source buffer */
@@ -101,7 +101,7 @@ int main(void)
     u32RxDataCount = 0;
     printf("< Stage 2 >\n");
     printf("Enable Dual I/O output mode. Slave is ready to transfer.\n");
-    
+
     /* Access TX and RX FIFO */
     while(u32RxDataCount < TEST_COUNT)
     {
@@ -112,8 +112,8 @@ int main(void)
         if(SPI_GET_RX_FIFO_EMPTY_FLAG(SPI0) == 0)
             g_au32DestinationData[u32RxDataCount++] = SPI_READ_RX0(SPI0); /* Read RX FIFO */
     }
-    
-    
+
+
     printf("\n\nExit SPI driver sample code.\n");
 
     /* Disable SPI0 peripheral clock */
@@ -123,6 +123,7 @@ int main(void)
 
 void SYS_Init(void)
 {
+	uint32_t u32TimeOutCnt;
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init System Clock                                                                                       */
     /*---------------------------------------------------------------------------------------------------------*/
@@ -135,7 +136,9 @@ void SYS_Init(void)
     CLK->PWRCON |= CLK_PWRCON_XTL12M_EN_Msk;
 
     /* Waiting for clock ready */
-    while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk));
+    u32TimeOutCnt = __HIRC;
+	while(!(CLK->CLKSTATUS & CLK_CLKSTATUS_XTL12M_STB_Msk))
+		if(--u32TimeOutCnt == 0) break;
 
     /* Select HXT as the clock source of HCLK */
     CLK->CLKSEL0 = (CLK->CLKSEL0 & (~CLK_CLKSEL0_HCLK_S_Msk)) | CLK_CLKSEL0_HCLK_S_HXT;
@@ -190,5 +193,3 @@ void SPI_Init(void)
 }
 
 /*** (C) COPYRIGHT 2014~2015 Nuvoton Technology Corp. ***/
-
-
